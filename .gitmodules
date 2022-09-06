@@ -1,0 +1,6 @@
+[submodule "stm32f091/lib/STM32-base"]
+	path = stm32f091/lib/STM32-base
+	url = https://github.com/STM32-base/STM32-base
+[submodule "stm32f091/lib/STM32CubeF0"]
+	path = stm32f091/lib/STM32CubeF0
+	url = https://github.com/STMicroelectronics/STM32CubeF0
