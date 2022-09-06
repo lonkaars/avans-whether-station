@@ -2,9 +2,10 @@
 
 |task|author|
 |-|-|
-|build systeem|loek|
+|build system|loek|
 |freertos|björn|
 |esp8266|niels|
 |sensor data / i2c connection||
 |qt gui|joshua|
-|database||
+|reseach on data storage solutions|loek|
+
