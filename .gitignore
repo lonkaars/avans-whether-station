@@ -2,3 +2,4 @@ copyright
 **/*.o
 stm32f091/main.elf
 stm32f091/main.bin
+**/compile_commands.json

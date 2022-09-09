@@ -9,6 +9,7 @@ SHARED_FLAGS += -g
 SHARED_FLAGS += -D STM32F091xC
 SHARED_FLAGS += -Wall
 SHARED_FLAGS += -Wextra
+SHARED_FLAGS += -Wno-register
 SHARED_FLAGS += -Wa,--defsym,CALL_ARM_SYSTEM_INIT=1
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/ARM/inc
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/inc
@@ -35,6 +36,11 @@ OBJS += $(patsubst %.cpp,%.o, $(wildcard *.cpp))
 OBJS += ./lib/STM32-base/startup/STM32F0xx/STM32F091xC.o
 OBJS += ./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/src/system_stm32f0xx.o
 
+.PHONY: flash clean
+
+$(TARGET).bin: $(TARGET).elf
+	$(OC) -O binary $< $@
+
 %.o: %.s
 	$(CC) -c $(AFLAGS) $< -o $@
 
@@ -46,9 +52,6 @@ OBJS += ./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/src/system_stm32f0xx.o
 
 $(TARGET).elf: $(OBJS)
 	$(LD) $(LFLAGS) $^ -o $@
-
-$(TARGET).bin: $(TARGET).elf
-	$(OC) -O binary $< $@
 
 flash: $(TARGET).bin
 	st-flash write $(TARGET).bin 0x08000000
