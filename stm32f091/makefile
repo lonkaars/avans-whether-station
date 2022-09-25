@@ -1,5 +1,5 @@
-CC = arm-none-eabi-g++
-LD = arm-none-eabi-g++
+CC = arm-none-eabi-gcc
+LD = arm-none-eabi-gcc
 OC = arm-none-eabi-objcopy
 RM = rm -f
 
@@ -9,7 +9,7 @@ SHARED_FLAGS += -g
 SHARED_FLAGS += -D STM32F091xC
 SHARED_FLAGS += -Wall
 SHARED_FLAGS += -Wextra
-SHARED_FLAGS += -Wno-register
+# SHARED_FLAGS += -Wno-register
 SHARED_FLAGS += -Wa,--defsym,CALL_ARM_SYSTEM_INIT=1
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/ARM/inc
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/inc
@@ -20,8 +20,8 @@ SHARED_FLAGS += -mlittle-endian
 SHARED_FLAGS += -mthumb
 SHARED_FLAGS += -masm-syntax-unified
 SHARED_FLAGS += -specs=nosys.specs
-SHARED_FLAGS += -fno-threadsafe-statics
-SHARED_FLAGS += -fno-rtti
+# SHARED_FLAGS += -fno-threadsafe-statics
+# SHARED_FLAGS += -fno-rtti
 SHARED_FLAGS += -fno-exceptions
 SHARED_FLAGS += -fno-unwind-tables
 SHARED_FLAGS += -Wl,-L./lib/STM32-base/linker,-T./lib/STM32-base/linker/STM32F0xx/STM32F091xC.ld
@@ -32,7 +32,7 @@ CFLAGS += $(SHARED_FLAGS)
 LFLAGS += $(SHARED_FLAGS)
 AFLAGS += $(SHARED_FLAGS)
 
-OBJS += $(patsubst %.cpp,%.o, $(wildcard *.cpp))
+OBJS += $(patsubst %.c,%.o, $(wildcard *.c))
 OBJS += ./lib/STM32-base/startup/STM32F0xx/STM32F091xC.o
 OBJS += ./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/src/system_stm32f0xx.o
 
@@ -47,7 +47,7 @@ $(TARGET).bin: $(TARGET).elf
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
-%.o: %.cpp
+%.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 $(TARGET).elf: $(OBJS)
