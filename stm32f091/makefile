@@ -18,7 +18,7 @@ SHARED_FLAGS += -ffunction-sections
 SHARED_FLAGS += -fdata-sections
 SHARED_FLAGS += -mlittle-endian
 SHARED_FLAGS += -mthumb
-SHARED_FLAGS += -masm-syntax-unified
+# SHARED_FLAGS += -masm-syntax-unified
 SHARED_FLAGS += -specs=nosys.specs
 # SHARED_FLAGS += -fno-threadsafe-statics
 # SHARED_FLAGS += -fno-rtti
