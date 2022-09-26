@@ -6,3 +6,7 @@
 	path = stm32f091/lib/STM32-base-STM32Cube
 	url = https://github.com/STM32-base/STM32-base-STM32Cube
 	ignore = all
+[submodule "stm32f091/lib/FreeRTOS-Kernel"]
+	path = stm32f091/lib/FreeRTOS-Kernel
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel
+	ignore = all
