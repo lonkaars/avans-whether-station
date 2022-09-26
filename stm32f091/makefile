@@ -11,6 +11,7 @@ SHARED_FLAGS += -Wall
 SHARED_FLAGS += -Wextra
 # SHARED_FLAGS += -Wno-register
 SHARED_FLAGS += -Wa,--defsym,CALL_ARM_SYSTEM_INIT=1
+# SHARED_FLAGS += -I/usr/arm-none-eabi/include/
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/ARM/inc
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/inc
 SHARED_FLAGS += -I./lib/STM32-base/startup

@@ -20,10 +20,10 @@ typedef struct {
 } ws_s_backlog_record;
 
 typedef struct {
-	uint16_t buffer_size; /**< buffer size (buffer_size + 1 = amount of records) */
+	uint16_t buffer_size; /**< buffer size (amount of records) */
 	uint16_t buffer_start; /** first record index */
 	uint16_t buffer_end; /** last record index */
-	ws_s_backlog_record* records; /** pointer to record array */
+	ws_s_backlog_record records[]; /** record array */
 } ws_s_backlog_database;
 
 // disable struct packing
@@ -38,7 +38,7 @@ extern ws_s_backlog_database* WS_G_BACKLOG_DATABASE;
  * automatically sets record.id, pushes buffer_end forwards and overwrites the
  * last record if the buffer is full
  */
-void ws_backlog_add_record(ws_s_backlog_record* record);
+void ws_backlog_add_record(ws_s_backlog_record record);
 
 /**
  * there's intentionally no function to retrieve multiple records as an array,
@@ -51,4 +51,7 @@ void ws_backlog_add_record(ws_s_backlog_record* record);
 
 /** @brief get pointer to record with index `record_index` from the database */
 ws_s_backlog_record* ws_backlog_get_record(uint16_t record_index);
+
+/** @brief get pointer to last record with offset `record_offset` from the database */
+ws_s_backlog_record* ws_backlog_get_last_record(uint16_t record_offset);
 
