@@ -7,3 +7,4 @@ stm32f091/.cache
 client/makefile
 client/client
 .qmake.stash
+.vscode/.cortex-debug.registers.state.json

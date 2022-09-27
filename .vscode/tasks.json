@@ -1,0 +1,45 @@
+{
+	"version": "2.0.0",
+	"options": {
+		"cwd": "${workspaceFolder}",
+		"shell": {
+			"executable": "C:/msys64/msys2_shell.cmd",
+			"args": [ "-defterm", "-no-start", "-mingw64", "-shell", "sh", "-here", "-c" ],
+		}
+	},
+	"tasks": [
+		{
+			"label": "build stm32 firmware",
+			"group": {
+				"isDefault": false,
+				"kind": "build"
+			},
+			"options": { "cwd": "${workspaceFolder}/stm32f091" },
+			"command": "make",
+			"args": [ "" ],
+			"type": "shell"
+		},
+		{
+			"label": "flash stm32 firmware",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"options": { "cwd": "${workspaceFolder}/stm32f091" },
+			"command": "make flash",
+			"args": [ "" ],
+			"type": "shell"
+		},
+		{
+			"label": "generate compilation db",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"options": { "cwd": "${workspaceFolder}/stm32f091" },
+			"command": "make compile_commands",
+			"args": [ "" ],
+			"type": "shell"
+		}
+	]
+}
