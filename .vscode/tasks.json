@@ -1,11 +1,13 @@
 {
 	"version": "2.0.0",
-	"options": {
-		"cwd": "${workspaceFolder}",
-		"shell": {
-			"executable": "C:/msys64/msys2_shell.cmd",
-			"args": [ "-defterm", "-no-start", "-mingw64", "-shell", "sh", "-here", "-c" ],
-		}
+	"windows": {
+		"options": {
+			"cwd": "${workspaceFolder}",
+			"shell": {
+				"executable": "C:/msys64/msys2_shell.cmd",
+				"args": [ "-defterm", "-no-start", "-mingw64", "-shell", "sh", "-here", "-c" ]
+			},
+		},
 	},
 	"tasks": [
 		{
@@ -26,8 +28,12 @@
 				"kind": "test"
 			},
 			"options": { "cwd": "${workspaceFolder}/stm32f091" },
-			"command": "make flash",
-			"args": [ "" ],
+			"windows": {
+				"command": "make flash",
+				"args": [ "" ],
+			},
+			"command": "make",
+			"args": [ "flash" ],
 			"type": "shell"
 		},
 		{
@@ -37,8 +43,12 @@
 				"kind": "test"
 			},
 			"options": { "cwd": "${workspaceFolder}/stm32f091" },
-			"command": "make compile_commands",
-			"args": [ "" ],
+			"windows": {
+				"command": "make compile_commands",
+				"args": [ "" ],
+			},
+			"command": "make",
+			"args": [ "compile_commands" ],
 			"type": "shell"
 		}
 	]

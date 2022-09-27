@@ -9,9 +9,11 @@
             "type": "cortex-debug",
             "runToEntryPoint": "main",
             "servertype": "stlink",
-            "armToolchainPath": "C:/msys64/mingw64/bin",
-            "stlinkPath": "C:/msys64/mingw64/bin/st-util.exe",
-            "gdbPath": "C:/msys64/mingw64/bin/gdb-multiarch.exe"
+            "windows": {
+                "armToolchainPath": "C:/msys64/mingw64/bin",
+                "stlinkPath": "C:/msys64/mingw64/bin/st-util.exe",
+                "gdbPath": "C:/msys64/mingw64/bin/gdb-multiarch.exe"
+            },
         }
     ]
 }
