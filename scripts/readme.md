@@ -1,6 +1,6 @@
 # scripts
 
-this subdirectory contains auxiliary scripts
+this subdirectory contains build toolchain setup and other auxiliary scripts
 
 ## windows install
 
@@ -19,3 +19,11 @@ done!" to appear.
 you've now installed the necessary tools to compile, upload and debug the stm32
 firmware. shortcuts for commonly used commands are implemented as visual studio
 code tasks, so you don't have to be a terminal ninja.
+
+### notes
+
+- if you're experiencing libusb-related issues while using st-link, try using
+  [zadig](https://zadig.akeo.ie/) to update the usb driver.
+- make sure to use the 64-bit version of msys2 (titled "MSYS2 MINGW64" in your
+  start menu)
+
