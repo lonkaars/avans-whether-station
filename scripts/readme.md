@@ -26,4 +26,3 @@ code tasks, so you don't have to be a terminal ninja.
   [zadig](https://zadig.akeo.ie/) to update the usb driver.
 - make sure to use the 64-bit version of msys2 (titled "MSYS2 MINGW64" in your
   start menu)
-

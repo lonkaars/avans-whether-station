@@ -5,4 +5,7 @@ pacman --noconfirm --needed -Sy \
     arm-none-eabi-gdb \
     arm-none-eabi-newlib \
     arm-none-eabi-binutils \
-    stlink
+    stlink \
+    python python-pip
+
+pip3 install compiledb

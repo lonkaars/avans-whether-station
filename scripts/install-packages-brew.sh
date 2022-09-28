@@ -9,4 +9,3 @@ brew install --cask \
     make git \
     gcc-arm-embedded \
     stlink
-

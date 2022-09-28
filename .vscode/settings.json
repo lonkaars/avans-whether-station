@@ -7,5 +7,6 @@
 			"icon": "terminal-bash"
 		}
 	},
-	"cmake.configureOnOpen": false
+	"cmake.configureOnOpen": false,
+	"files.eol": "\n"
 }

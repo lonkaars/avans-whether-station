@@ -6,6 +6,9 @@ pacman --noconfirm --needed -Sy \
     mingw-w64-x86_64-arm-none-eabi-newlib \
     mingw-w64-x86_64-arm-none-eabi-binutils \
     mingw-w64-x86_64-stlink \
-    mingw-w64-x86_64-gdb-multiarch
+    mingw-w64-x86_64-gdb-multiarch \
+    python python-pip
+
+pip3 install compiledb
 
 printf "\n\n\ninstalling packages done!"

@@ -72,7 +72,7 @@ flash: $(TARGET).bin
 
 compile_commands: clean
 	compiledb make
+	../scripts/compiledb-full-path-mingw.sh compile_commands.json
 
 clean:
 	$(RM) $(TARGET).bin $(TARGET).elf $(OBJS)
-
