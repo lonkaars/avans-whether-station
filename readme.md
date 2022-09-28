@@ -20,7 +20,9 @@ listed below. toolchain installation scripts can be found in the
 |STM32 makefile compilation|yes|yes|?|
 |STM32 makefile upload|yes|yes|?|
 |STM32 debugging (vscode)|yes|yes|?|
+|STM32 editor autocomplete|yes|?|?|
 |QT client compilation (qmake)|yes|?|?|
 |QT client running|yes|?|?|
-|QT client debugging (vscode)|?|?|?|
+|QT client debugging (vscode)|yes|?|?|
+|QT client editor autocomplete|yes|?|?|
 

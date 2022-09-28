@@ -11,3 +11,4 @@ SOURCES += \
 
 target.path = $$[QT_INSTALL_EXAMPLES]/charts/zoomlinechart
 INSTALLS += target
+CONFIG += force_debug_info

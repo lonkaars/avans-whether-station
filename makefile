@@ -10,5 +10,8 @@ client_makefile:
 client: client_makefile
 	make -C client
 
+client_compile_commands: client_makefile
+	compiledb -o client/compile_commands.json make -C client
+
 stm32:
 	make -C stm32f091

@@ -11,44 +11,99 @@
 	},
 	"tasks": [
 		{
-			"label": "build stm32 firmware",
+			"label": "stm32/build",
+			"detail": "build stm32 code without uploading",
 			"group": {
 				"isDefault": false,
 				"kind": "build"
 			},
 			"options": { "cwd": "${workspaceFolder}/stm32f091" },
+			"windows": {
+				"command": "make -j",
+				"args": [ "" ],
+			},
 			"command": "make",
-			"args": [ "" ],
+			"args": [ "-j" ],
 			"type": "shell"
 		},
 		{
-			"label": "flash stm32 firmware",
+			"label": "stm32/flash",
+			"detail": "build and upload to stm32",
 			"group": {
 				"isDefault": false,
 				"kind": "test"
 			},
 			"options": { "cwd": "${workspaceFolder}/stm32f091" },
 			"windows": {
-				"command": "make flash",
+				"command": "make -j flash",
 				"args": [ "" ],
 			},
 			"command": "make",
-			"args": [ "flash" ],
+			"args": [ "-j", "flash" ],
 			"type": "shell"
 		},
 		{
-			"label": "generate compilation db",
+			"label": "stm32/compiledb",
+			"detail": "generate editor autocomplete files for stm23 source code",
 			"group": {
 				"isDefault": false,
 				"kind": "test"
 			},
 			"options": { "cwd": "${workspaceFolder}/stm32f091" },
 			"windows": {
-				"command": "make compile_commands",
+				"command": "make -j compile_commands",
 				"args": [ "" ],
 			},
 			"command": "make",
-			"args": [ "compile_commands" ],
+			"args": [ "-j", "compile_commands" ],
+			"type": "shell"
+		},
+		{
+			"label": "client/build",
+			"detail": "build qt client application",
+			"group": {
+				"isDefault": false,
+				"kind": "build"
+			},
+			"options": { "cwd": "${workspaceFolder}" },
+			"windows": {
+				"command": "make -j client",
+				"args": [ "" ],
+			},
+			"command": "make",
+			"args": [ "-j", "client" ],
+			"type": "shell"
+		},
+		{
+			"label": "client/compiledb",
+			"detail": "generate editor autocomplete files for qt client source code",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"options": { "cwd": "${workspaceFolder}" },
+			"windows": {
+				"command": "make -j client_compile_commands",
+				"args": [ "" ],
+			},
+			"command": "make",
+			"args": [ "-j", "client_compile_commands" ],
+			"type": "shell"
+		},
+		{
+			"label": "clean",
+			"detail": "remove binary files from working directory",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"options": { "cwd": "${workspaceFolder}" },
+			"windows": {
+				"command": "make clean",
+				"args": [ "" ],
+			},
+			"command": "make",
+			"args": [ "clean" ],
 			"type": "shell"
 		}
 	]

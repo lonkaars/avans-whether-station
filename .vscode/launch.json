@@ -2,6 +2,30 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "client debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/client/client",
+            "args": [],
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "client/build",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description":  "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "stm32 debug",
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceFolder}/stm32f091/main.elf",
@@ -9,6 +33,7 @@
             "type": "cortex-debug",
             "runToEntryPoint": "main",
             "servertype": "stlink",
+            "preLaunchTask": "stm32/build",
             "windows": {
                 "armToolchainPath": "C:/msys64/mingw64/bin",
                 "stlinkPath": "C:/msys64/mingw64/bin/st-util.exe",

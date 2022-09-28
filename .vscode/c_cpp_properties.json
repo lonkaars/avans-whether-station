@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "name": "stm32f091",
+            "compileCommands": "${workspaceFolder}/stm32f091/compile_commands.json"
+        },
+        {
+            "name": "client",
+            "compileCommands": "${workspaceFolder}/client/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
