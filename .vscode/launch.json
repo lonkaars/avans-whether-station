@@ -34,11 +34,14 @@
             "runToEntryPoint": "main",
             "servertype": "stlink",
             "preLaunchTask": "stm32/build",
+            "linux": {
+                "stlinkPath": "/usr/bin/st-util"
+            },
             "windows": {
                 "armToolchainPath": "C:/msys64/mingw64/bin",
                 "stlinkPath": "C:/msys64/mingw64/bin/st-util.exe",
                 "gdbPath": "C:/msys64/mingw64/bin/gdb-multiarch.exe"
-            },
+            }
         }
     ]
 }
