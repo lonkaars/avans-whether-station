@@ -12,6 +12,7 @@ SHARED_FLAGS += -Wextra
 # SHARED_FLAGS += -Wno-register
 SHARED_FLAGS += -Wa,--defsym,CALL_ARM_SYSTEM_INIT=1
 # SHARED_FLAGS += -I/usr/arm-none-eabi/include/
+SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/HAL/STM32F0xx/inc
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/ARM/inc
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/inc
 SHARED_FLAGS += -I./lib/STM32-base/startup
@@ -22,10 +23,7 @@ SHARED_FLAGS += -ffunction-sections
 SHARED_FLAGS += -fdata-sections
 SHARED_FLAGS += -mlittle-endian
 SHARED_FLAGS += -mthumb
-# SHARED_FLAGS += -masm-syntax-unified
 SHARED_FLAGS += -specs=nosys.specs
-# SHARED_FLAGS += -fno-threadsafe-statics
-# SHARED_FLAGS += -fno-rtti
 SHARED_FLAGS += -fno-exceptions
 SHARED_FLAGS += -fno-unwind-tables
 SHARED_FLAGS += -Wl,-L./lib/STM32-base/linker,-T./lib/STM32-base/linker/STM32F0xx/STM32F091xC.ld
@@ -46,6 +44,15 @@ OBJS += lib/FreeRTOS-Kernel/croutine.o \
         lib/FreeRTOS-Kernel/timers.o \
         lib/FreeRTOS-Kernel/portable/GCC/ARM_CM0/port.o \
         lib/FreeRTOS-Kernel/portable/MemMang/heap_4.o
+OBJS += lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_gpio.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_cortex.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_flash.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2c.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2s.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_pwr.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_rtc.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_usart.o
 
 OBJS += ./lib/STM32-base/startup/STM32F0xx/STM32F091xC.o
 OBJS += ./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/src/system_stm32f0xx.o
@@ -57,9 +64,6 @@ $(TARGET).bin: $(TARGET).elf
 
 %.o: %.s
 	$(CC) -c $(AFLAGS) $< -o $@
-
-%.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
@@ -76,3 +80,4 @@ compile_commands: clean
 
 clean:
 	$(RM) $(TARGET).bin $(TARGET).elf $(OBJS)
+
