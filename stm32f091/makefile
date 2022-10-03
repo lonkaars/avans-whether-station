@@ -6,13 +6,14 @@ RM = rm -f
 TARGET = main
 
 SHARED_FLAGS += -g
-SHARED_FLAGS += -D STM32F091xC
+SHARED_FLAGS += -DSTM32F091xC
 SHARED_FLAGS += -Wall
 SHARED_FLAGS += -Wextra
 # SHARED_FLAGS += -Wno-register
 SHARED_FLAGS += -Wa,--defsym,CALL_ARM_SYSTEM_INIT=1
 # SHARED_FLAGS += -I/usr/arm-none-eabi/include/
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/HAL/STM32F0xx/inc
+SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/HAL/STM32F0xx/inc/Legacy
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/ARM/inc
 SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/inc
 SHARED_FLAGS += -I./lib/STM32-base/startup
@@ -35,6 +36,8 @@ LFLAGS += $(SHARED_FLAGS)
 AFLAGS += $(SHARED_FLAGS)
 
 OBJS += $(patsubst %.c,%.o, $(wildcard *.c))
+OBJS += ./lib/STM32-base/startup/STM32F0xx/STM32F091xC.o
+OBJS += ./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/src/system_stm32f0xx.o
 OBJS += lib/FreeRTOS-Kernel/croutine.o \
         lib/FreeRTOS-Kernel/event_groups.o \
         lib/FreeRTOS-Kernel/list.o \
@@ -44,18 +47,16 @@ OBJS += lib/FreeRTOS-Kernel/croutine.o \
         lib/FreeRTOS-Kernel/timers.o \
         lib/FreeRTOS-Kernel/portable/GCC/ARM_CM0/port.o \
         lib/FreeRTOS-Kernel/portable/MemMang/heap_4.o
-OBJS += lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_gpio.o \
-        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_cortex.o \
-        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_flash.o \
-        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2c.o \
-        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2s.o \
-        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_pwr.o \
-        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_rtc.o \
-        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart.o \
-        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_usart.o
-
-OBJS += ./lib/STM32-base/startup/STM32F0xx/STM32F091xC.o
-OBJS += ./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/src/system_stm32f0xx.o
+OBJS += lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_gpio.o
+# OBJS += lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_gpio.o \
+#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_cortex.o \
+#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_flash.o \
+#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2c.o \
+#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2s.o \
+#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_pwr.o \
+#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_rtc.o \
+#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart.o \
+#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_usart.o
 
 .PHONY: flash clean
 
@@ -75,7 +76,7 @@ flash: $(TARGET).bin
 	st-flash write $(TARGET).bin 0x08000000
 
 compile_commands: clean
-	compiledb make
+	compiledb make -n
 	../scripts/compiledb-full-path-mingw.sh compile_commands.json
 
 clean:
