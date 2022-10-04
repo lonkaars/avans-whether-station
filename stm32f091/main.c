@@ -18,12 +18,13 @@ void task_1() {
 
 int main() {
 	HAL_Init();
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.Pin = GPIO_PIN_5;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	HAL_GPIO_Init(GPIOA, &(GPIO_InitTypeDef) {
+		.Pin = GPIO_PIN_5,
+		.Mode = GPIO_MODE_OUTPUT_PP,
+		.Pull = GPIO_NOPULL
+	});
 
 	xTaskCreate(task_1, "task1", 128, NULL, 1, NULL);
 	vTaskStartScheduler();
