@@ -20,8 +20,10 @@ SHARED_FLAGS += -I./lib/STM32-base/startup
 SHARED_FLAGS += -I./lib/FreeRTOS-Kernel/include
 SHARED_FLAGS += -I./lib/FreeRTOS-Kernel/portable/GCC/ARM_CM0/
 SHARED_FLAGS += -I.
+SHARED_FLAGS += -O1
 SHARED_FLAGS += -ffunction-sections
 SHARED_FLAGS += -fdata-sections
+SHARED_FLAGS += -Wl,--gc-sections
 SHARED_FLAGS += -mlittle-endian
 SHARED_FLAGS += -mthumb
 SHARED_FLAGS += -specs=nosys.specs
@@ -47,16 +49,22 @@ OBJS += lib/FreeRTOS-Kernel/croutine.o \
         lib/FreeRTOS-Kernel/timers.o \
         lib/FreeRTOS-Kernel/portable/GCC/ARM_CM0/port.o \
         lib/FreeRTOS-Kernel/portable/MemMang/heap_4.o
-OBJS += lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_gpio.o
-# OBJS += lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_gpio.o \
-#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_cortex.o \
-#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_flash.o \
-#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2c.o \
-#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2s.o \
-#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_pwr.o \
-#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_rtc.o \
-#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart.o \
-#         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_usart.o
+OBJS += lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_rcc.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_rcc_ex.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2c.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_i2c_ex.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_gpio.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_dma.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_cortex.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_pwr.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_pwr_ex.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_flash.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_flash_ex.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_tim.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_tim_ex.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart.o \
+        lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart_ex.o
 
 .PHONY: flash clean
 
