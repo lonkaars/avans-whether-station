@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="pushButton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>0</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>DoesSomething</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>-10</x>
+      <y>40</y>
+      <width>801</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QTableView" name="tableView"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAbouy">
+    <property name="title">
+     <string>Home</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionRefresh"/>
+   </widget>
+   <widget class="QMenu" name="menuTEMP">
+    <property name="title">
+     <string>TEMP</string>
+    </property>
+    <addaction name="actionLOAD"/>
+    <addaction name="actionQuerry"/>
+   </widget>
+   <widget class="QMenu" name="menuDatabase">
+    <property name="title">
+     <string>Database</string>
+    </property>
+    <addaction name="actionConnection"/>
+    <addaction name="actionDisconnenct"/>
+    <addaction name="actionStatus"/>
+   </widget>
+   <addaction name="menuAbouy"/>
+   <addaction name="menuTEMP"/>
+   <addaction name="menuDatabase"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
+  <action name="actionLOAD">
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </action>
+  <action name="actionQuerry">
+   <property name="text">
+    <string>Query</string>
+   </property>
+  </action>
+  <action name="actionConnection">
+   <property name="text">
+    <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionDisconnenct">
+   <property name="text">
+    <string>Disconnenct</string>
+   </property>
+  </action>
+  <action name="actionQuerry_2">
+   <property name="text">
+    <string>Querry</string>
+   </property>
+  </action>
+  <action name="actionStatus">
+   <property name="text">
+    <string>Status</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
