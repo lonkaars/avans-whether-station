@@ -1,0 +1,25 @@
+diff --git a/driver/inc/Si7021_driver.h b/driver/inc/Si7021_driver.h
+index 7ed1f4a..50803ef 100644
+--- a/driver/inc/Si7021_driver.h
++++ b/driver/inc/Si7021_driver.h
+@@ -1,7 +1,7 @@
+ #ifndef SI7021_H_
+ #define SI7021_H_
+ 
+-#include "stm32f4xx_hal.h"
++#include "stm32f0xx_hal.h"
+ 
+ #define RES0 0
+ #define RES1 7
+diff --git a/driver/src/Si7021_driver.c b/driver/src/Si7021_driver.c
+index 47df31c..d11ee38 100644
+--- a/driver/src/Si7021_driver.c
++++ b/driver/src/Si7021_driver.c
+@@ -1,5 +1,6 @@
+ #include <Si7021_driver.h>
+-#include <i2c.h>
++#include "stm32f0xx_hal_i2c.h"
++#include "main.h"
+ 
+ static const uint16_t I2C_ADDR = (0x40<<1);           // Si7021 I2C address
+ static const uint8_t  HEATER_CURRENT_OFFSET = 3;      // current value in mA for register value 0

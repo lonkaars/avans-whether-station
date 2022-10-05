@@ -19,6 +19,7 @@ SHARED_FLAGS += -I./lib/STM32-base-STM32Cube/CMSIS/STM32F0xx/inc
 SHARED_FLAGS += -I./lib/STM32-base/startup
 SHARED_FLAGS += -I./lib/FreeRTOS-Kernel/include
 SHARED_FLAGS += -I./lib/FreeRTOS-Kernel/portable/GCC/ARM_CM0/
+SHARED_FLAGS += -I./lib/Si7021_driver_STM32/driver/inc/
 SHARED_FLAGS += -I.
 SHARED_FLAGS += -O1
 SHARED_FLAGS += -ffunction-sections
@@ -65,6 +66,7 @@ OBJS += lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_rcc.o \
         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_tim_ex.o \
         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart.o \
         lib/STM32-base-STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart_ex.o
+OBJS += lib/Si7021_driver_STM32/driver/src/Si7021_driver.o
 
 .PHONY: flash clean
 
