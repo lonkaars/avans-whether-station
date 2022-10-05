@@ -2,7 +2,7 @@
 
 #include <QMainWindow>
 
-#include "database.h"
+//#include "database.h"
 #include "dbconnector.h"
 
 #include <QMessageBox>
@@ -38,5 +38,5 @@ private:
 
 //    QSqlQueryModel *pQueryModel;
 
-    Database database;
+//    Database database;
 };

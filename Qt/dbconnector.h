@@ -6,7 +6,7 @@
 //#include <QtSql>
 //#include <QSqlDatabase>
 
-#include "database.h"
+//#include "database.h"
 
 namespace Ui {
 class dbConnector;
