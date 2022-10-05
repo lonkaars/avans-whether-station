@@ -2,9 +2,10 @@ copyright
 **/*.o
 stm32f091/main.elf
 stm32f091/main.bin
-stm32f091/.cache
+**/.cache
 **/compile_commands.json
 client/makefile
 client/client
+client/moc_*
 .qmake.stash
 .vscode/.cortex-debug.registers.state.json

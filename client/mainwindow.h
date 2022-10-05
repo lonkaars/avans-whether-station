@@ -36,7 +36,7 @@ private:
     dbConnector *_dbConenctor;
 //    QSqlDatabase db;
 
-//    QSqlQueryModel *pQueryModel;
+    QSqlQueryModel *pQueryModel;
 
 //    Database database;
 };
