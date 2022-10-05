@@ -32,7 +32,7 @@ void dbConnector::on_pushButton_login_clicked()
 
 //    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
 //    return;
-    dbRef.setHostName(adress);
+    dbRef.setHostName(hostname);
     dbRef.setUserName(username);
     dbRef.setPassword(password);
     dbRef.setDatabaseName("thecrapbox");
