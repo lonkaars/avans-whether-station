@@ -1,14 +1,26 @@
 #include <FreeRTOS.h>
 #include <task.h>
-#include <Si7021_driver.h>
+#include <stm32f0xx_hal.h>
 
+#include "main.h"
 #include "sensor.h"
 #include "backlog.h"
 
+#define SI7021_ADDRESS ((uint16_t)(0x40) << 1)
+#define REG_TEMP ((uint8_t)(0xE3))
+#define REG_HUM ((uint8_t)(0xF5))
+
 uint8_t ws_sensor_temperature() {
-	float temp = 0.f;
-	r_single_Si7021(&temp, Temperature);
-	return (uint8_t) temp; //TODO: convert with range -> util.h
+	uint8_t buf[12];
+	int16_t val;
+	float temp_c;
+	buf[0] = REG_TEMP;
+	HAL_I2C_Master_Transmit(&hi2c1, SI7021_ADDRESS, buf, 1, HAL_MAX_DELAY);
+	HAL_I2C_Master_Receive(&hi2c1, SI7021_ADDRESS, buf, 2, HAL_MAX_DELAY);
+	val = ((int16_t)buf[0]<< 8 ) | (buf[1]);
+	temp_c= ((175.72*val)/65536) - 46.85;
+
+	return (uint8_t) temp_c; //TODO: convert with range -> util.h
 }
 
 uint8_t ws_sensor_humidity() {

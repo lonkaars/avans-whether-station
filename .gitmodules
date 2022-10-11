@@ -10,7 +10,3 @@
 	path = stm32f091/lib/FreeRTOS-Kernel
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel
 	ignore = all
-[submodule "stm32f091/lib/Si7021_driver_STM32"]
-	path = stm32f091/lib/Si7021_driver_STM32
-	url = https://github.com/Csatacsibe/Si7021_driver_STM32
-	ignore = all
