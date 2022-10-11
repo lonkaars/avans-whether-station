@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stm32f0xx_hal.h>
 #include <stm32f0xx_hal_i2c.h>
 #include <stm32f0xx_hal_uart.h>
 
@@ -17,3 +18,9 @@ extern UART_HandleTypeDef huart2;
 
 void ws_io_setup();
 
+void NMI_Handler();
+void HardFault_Handler();
+void SysTick_Handler();
+void HAL_MspInit();
+void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c);
+void HAL_UART_MspInit(UART_HandleTypeDef *huart);

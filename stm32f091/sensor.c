@@ -11,8 +11,7 @@
 #define REG_HUM ((uint8_t)(0xF5))
 
 uint8_t ws_sensor_temperature() {
-	HAL_UART_Transmit(&huart2, (uint8_t * const) "hello world!", 13, 100);
-	return 0;
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 	uint8_t buf[12];
 	int16_t val;
 	float temp_c;
@@ -45,7 +44,7 @@ void ws_sensor_read() {
 void ws_sensor_read_task() {
 	while (1) {
 		ws_sensor_read();
-		vTaskDelay(portTICK_PERIOD_MS * 1000 * 60);
+		vTaskDelay(portTICK_PERIOD_MS * 1000 * 1);
 	}
 }
 

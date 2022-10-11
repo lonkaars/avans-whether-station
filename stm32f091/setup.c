@@ -2,6 +2,8 @@
 #include <stm32f0xx_hal_rcc.h>
 #include <stm32f0xx_hal_i2c.h>
 #include <stm32f0xx_hal_uart.h>
+#include <FreeRTOS.h>
+#include <task.h>
 
 #include "setup.h"
 
@@ -11,28 +13,17 @@ UART_HandleTypeDef huart2;
 static void ws_io_clock_setup();
 static void ws_io_i2c_setup();
 static void ws_io_usart2_setup();
-static void ws_io_gpio_setup();
 static void ws_setup_error_handler();
 
 void ws_io_setup() {
 	HAL_Init();
 
 	ws_io_clock_setup();
-	ws_io_gpio_setup();
 	ws_io_i2c_setup();
 	ws_io_usart2_setup();
 }
 
 static void ws_io_clock_setup() {
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-	__HAL_RCC_GPIOF_CLK_ENABLE();
-	__HAL_RCC_I2C1_CLK_ENABLE();
-	__HAL_RCC_PWR_CLK_ENABLE();
-	__HAL_RCC_SYSCFG_CLK_ENABLE();
-	__HAL_RCC_USART2_CLK_ENABLE();
-
 	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 	RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
@@ -74,13 +65,7 @@ static void ws_io_i2c_setup() {
 	hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 	if (HAL_I2C_Init(&hi2c1) != HAL_OK) return ws_setup_error_handler();
-
-	/** Configure Analogue filter
-	*/
 	if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK) return ws_setup_error_handler();
-
-	/** Configure Digital filter
-	*/
 	if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK) return ws_setup_error_handler();
 }
 
@@ -98,23 +83,32 @@ static void ws_io_usart2_setup() {
 	if (HAL_UART_Init(&huart2) != HAL_OK) return ws_setup_error_handler();
 }
 
-static void ws_io_gpio_setup() {
+void HAL_MspInit() {
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
+  __HAL_RCC_PWR_CLK_ENABLE();
+  HAL_NVIC_SetPriority(PendSV_IRQn, 3, 0);
+}
+
+void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c) {
+  if(hi2c->Instance != I2C1) return;
+
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	/**I2C1 GPIO Configuration
-		PB8     ------> I2C1_SCL
-		PB9     ------> I2C1_SDA
-		*/
+	__HAL_RCC_GPIOB_CLK_ENABLE();
 	GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9; //TODO: use #defines in setup.h
 	GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Alternate = GPIO_AF1_I2C1;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	__HAL_RCC_I2C1_CLK_ENABLE();
+}
 
-	/**USART2 GPIO Configuration
-		PA2     ------> USART2_TX
-		PA3     ------> USART2_RX
-		*/
+void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
+  if(huart->Instance != USART2) return;
+
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	__HAL_RCC_USART2_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
 	GPIO_InitStruct.Pin = WS_PINOUT_USART_TX_PIN | WS_PINOUT_USART_RX_PIN;
 	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -123,8 +117,20 @@ static void ws_io_gpio_setup() {
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
+void SysTick_Handler() {
+	HAL_IncTick();
+	if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) xPortSysTickHandler();
+}
+
 static void ws_setup_error_handler() {
 	__disable_irq();
 	for(;;);
 }
 
+void NMI_Handler() {
+	for(;;);
+}
+
+void HardFault_Handler() {
+	for(;;);
+}
