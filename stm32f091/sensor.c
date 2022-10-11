@@ -2,7 +2,7 @@
 #include <task.h>
 #include <stm32f0xx_hal.h>
 
-#include "main.h"
+#include "setup.h"
 #include "sensor.h"
 #include "backlog.h"
 
@@ -11,6 +11,8 @@
 #define REG_HUM ((uint8_t)(0xF5))
 
 uint8_t ws_sensor_temperature() {
+	HAL_UART_Transmit(&huart2, (uint8_t * const) "hello world!", 13, 100);
+	return 0;
 	uint8_t buf[12];
 	int16_t val;
 	float temp_c;
