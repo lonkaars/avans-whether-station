@@ -7,11 +7,47 @@
 
 #include "setup.h"
 
-I2C_HandleTypeDef hi2c1;
-UART_HandleTypeDef huart2;
+I2C_HandleTypeDef hi2c1 = {
+	.Instance = I2C1,
+	.Init.Timing = 0x2000090E,
+	.Init.OwnAddress1 = 0,
+	.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT,
+	.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE,
+	.Init.OwnAddress2 = 0,
+	.Init.OwnAddress2Masks = I2C_OA2_NOMASK,
+	.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE,
+	.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE,
+};
+
+UART_HandleTypeDef huart1 = {
+  .Instance = USART1,
+  .Init.BaudRate = 115200,
+  .Init.WordLength = UART_WORDLENGTH_8B,
+  .Init.StopBits = UART_STOPBITS_1,
+  .Init.Parity = UART_PARITY_NONE,
+  .Init.Mode = UART_MODE_TX_RX,
+  .Init.HwFlowCtl = UART_HWCONTROL_NONE,
+  .Init.OverSampling = UART_OVERSAMPLING_16,
+  .Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE,
+  .AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT,
+};
+
+UART_HandleTypeDef huart2 = {
+	.Instance = USART2,
+	.Init.BaudRate = 115200,
+	.Init.WordLength = UART_WORDLENGTH_8B,
+	.Init.StopBits = UART_STOPBITS_1,
+	.Init.Parity = UART_PARITY_NONE,
+	.Init.Mode = UART_MODE_TX_RX,
+	.Init.HwFlowCtl = UART_HWCONTROL_NONE,
+	.Init.OverSampling = UART_OVERSAMPLING_16,
+	.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE,
+	.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT,
+};
 
 static void ws_io_clock_setup();
 static void ws_io_i2c_setup();
+static void ws_io_usart1_setup();
 static void ws_io_usart2_setup();
 static void ws_setup_error_handler();
 
@@ -20,67 +56,52 @@ void ws_io_setup() {
 
 	ws_io_clock_setup();
 	ws_io_i2c_setup();
+	ws_io_usart1_setup();
 	ws_io_usart2_setup();
 }
 
 static void ws_io_clock_setup() {
-	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-	RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+	if (HAL_OK != HAL_RCC_OscConfig(&(RCC_OscInitTypeDef){
+		.OscillatorType = RCC_OSCILLATORTYPE_HSI,
+		.HSIState = RCC_HSI_ON,
+		.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT,
+		.PLL.PLLState = RCC_PLL_ON,
+		.PLL.PLLSource = RCC_PLLSOURCE_HSI,
+		.PLL.PLLMUL = RCC_PLL_MUL12,
+		.PLL.PREDIV = RCC_PREDIV_DIV2,
+	})) return ws_setup_error_handler();
 
-	/** Initializes the RCC Oscillators according to the specified parameters in
-	 * the RCC_OscInitTypeDef structure.
-	 */
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-	RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL12;
-	RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV2;
-	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) return ws_setup_error_handler();
+	if (HAL_OK != HAL_RCC_ClockConfig(&(RCC_ClkInitTypeDef){
+		.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1,
+		.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK,
+		.AHBCLKDivider = RCC_SYSCLK_DIV1,
+		.APB1CLKDivider = RCC_HCLK_DIV1,
+	}, FLASH_LATENCY_1)) return ws_setup_error_handler();
 
-	/** Initializes the CPU, AHB and APB buses clocks */
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-		|RCC_CLOCKTYPE_PCLK1;
-	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-
-	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK) return ws_setup_error_handler();
-	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1;
-	PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-	PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI;
-	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) return ws_setup_error_handler();
+	if (HAL_RCCEx_PeriphCLKConfig(&(RCC_PeriphCLKInitTypeDef){
+		.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1,
+		.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1,
+		.I2c1ClockSelection = RCC_I2C1CLKSOURCE_HSI,
+	}) != HAL_OK) return ws_setup_error_handler();
 }
 
 static void ws_io_i2c_setup() {
-	hi2c1.Instance = I2C1;
-	hi2c1.Init.Timing = 0x2000090E;
-	hi2c1.Init.OwnAddress1 = 0;
-	hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-	hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-	hi2c1.Init.OwnAddress2 = 0;
-	hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-	hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-	hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-	if (HAL_I2C_Init(&hi2c1) != HAL_OK) return ws_setup_error_handler();
-	if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK) return ws_setup_error_handler();
-	if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK) return ws_setup_error_handler();
+	if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+		return ws_setup_error_handler();
+	if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+		return ws_setup_error_handler();
+	if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+		return ws_setup_error_handler();
+}
+
+static void ws_io_usart1_setup() {
+	if (HAL_UART_Init(&huart1) != HAL_OK)
+		return ws_setup_error_handler();
 }
 
 static void ws_io_usart2_setup() {
-	huart2.Instance = USART2;
-	huart2.Init.BaudRate = 115200;
-	huart2.Init.WordLength = UART_WORDLENGTH_8B;
-	huart2.Init.StopBits = UART_STOPBITS_1;
-	huart2.Init.Parity = UART_PARITY_NONE;
-	huart2.Init.Mode = UART_MODE_TX_RX;
-	huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-	huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-	if (HAL_UART_Init(&huart2) != HAL_OK) return ws_setup_error_handler();
+	if (HAL_UART_Init(&huart2) != HAL_OK)
+		return ws_setup_error_handler();
 }
 
 void HAL_MspInit() {
@@ -92,29 +113,43 @@ void HAL_MspInit() {
 void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c) {
   if(hi2c->Instance != I2C1) return;
 
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	__HAL_RCC_GPIOB_CLK_ENABLE();
-	GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9; //TODO: use #defines in setup.h
-	GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF1_I2C1;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	HAL_GPIO_Init(GPIOB, &(GPIO_InitTypeDef) {
+		.Pin = GPIO_PIN_8|GPIO_PIN_9, //TODO: use #defines in setup.h
+		.Mode = GPIO_MODE_AF_OD,
+		.Pull = GPIO_NOPULL,
+		.Speed = GPIO_SPEED_FREQ_HIGH,
+		.Alternate = GPIO_AF1_I2C1,
+	});
 	__HAL_RCC_I2C1_CLK_ENABLE();
 }
 
 void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
-  if(huart->Instance != USART2) return;
+	if(huart->Instance == USART1) {
+		__HAL_RCC_USART1_CLK_ENABLE();
+		__HAL_RCC_GPIOA_CLK_ENABLE();
+		HAL_GPIO_Init(GPIOA, &(GPIO_InitTypeDef){
+    	.Pin = WS_PINOUT_USART1_TX_PIN | WS_PINOUT_USART1_RX_PIN,
+    	.Mode = GPIO_MODE_AF_PP,
+    	.Pull = GPIO_NOPULL,
+    	.Speed = GPIO_SPEED_FREQ_HIGH,
+    	.Alternate = GPIO_AF1_USART1,
+		});
 
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	__HAL_RCC_USART2_CLK_ENABLE();
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	GPIO_InitStruct.Pin = WS_PINOUT_USART_TX_PIN | WS_PINOUT_USART_RX_PIN;
-	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	GPIO_InitStruct.Alternate = GPIO_AF1_USART2;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    // USART1 interrupt Init
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
+	} else if (huart->Instance == USART2) {
+		__HAL_RCC_USART2_CLK_ENABLE();
+		__HAL_RCC_GPIOA_CLK_ENABLE();
+		HAL_GPIO_Init(GPIOA, &(GPIO_InitTypeDef) {
+			.Pin = WS_PINOUT_USART2_TX_PIN | WS_PINOUT_USART2_RX_PIN,
+			.Mode = GPIO_MODE_AF_PP,
+			.Pull = GPIO_NOPULL,
+			.Speed = GPIO_SPEED_FREQ_LOW,
+			.Alternate = GPIO_AF1_USART2,
+		});
+	}
 }
 
 void SysTick_Handler() {
