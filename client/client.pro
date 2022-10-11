@@ -1,23 +1,23 @@
-QT += core gui sql charts
+QT += core gui sql charts network
 
 HEADERS += \
-    dbconnector.h \
-    main.h \
-    mainwindow.h
-#   chart.h \
-#   chartview.h
+	dbconnector.h \
+	main.h \
+	mainwindow.h \
+	mytcpsocket.h \
+	timetest.h
 
 SOURCES += \
-    dbconnector.cpp \
-    main.cpp \
-    mainwindow.cpp
-#   chart.cpp \
-#   chartview.cpp
+	dbconnector.cpp \
+	main.cpp \
+	mainwindow.cpp \
+	mytcpsocket.cpp \
+	timetest.cpp
 
 
 FORMS += \
-    dbconnector.ui \
-    mainwindow.ui
+	dbconnector.ui \
+	mainwindow.ui
 
 INSTALLS += target
 CONFIG += force_debug_info
