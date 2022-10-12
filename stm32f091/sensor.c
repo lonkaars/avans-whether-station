@@ -7,16 +7,15 @@
 #include "backlog.h"
 
 #define SI7021_ADDRESS ((uint16_t)(0x40) << 1)
+#define SI7021_REG_TEMP ((uint8_t)(0xE3))
+#define SI7021_REG_HUM ((uint8_t)(0xE5))
 #define BMP280_ADDRESS ((uint16_t)(0x76) << 1)
-#define REG_TEMP ((uint8_t)(0xE3))
-#define REG_HUM ((uint8_t)(0xF5))
 
 uint8_t ws_sensor_temperature() {
-	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 	uint8_t buf[12];
 	int16_t val;
 	float temp_c;
-	buf[0] = REG_TEMP;
+	buf[0] = SI7021_REG_TEMP;
 	HAL_I2C_Master_Transmit(&hi2c1, SI7021_ADDRESS, buf, 1, HAL_MAX_DELAY);
 	HAL_I2C_Master_Receive(&hi2c1, SI7021_ADDRESS, buf, 2, HAL_MAX_DELAY);
 	val = ((int16_t)buf[0]<< 8 ) | (buf[1]);
@@ -26,7 +25,15 @@ uint8_t ws_sensor_temperature() {
 }
 
 uint8_t ws_sensor_humidity() {
-	return 0x00;
+	uint8_t buf[12];
+	int16_t val;
+	buf[0] = SI7021_REG_HUM;
+	HAL_I2C_Master_Transmit(&hi2c1, SI7021_ADDRESS, buf, 1, HAL_MAX_DELAY);
+	HAL_I2C_Master_Receive(&hi2c1, SI7021_ADDRESS, buf, 2, HAL_MAX_DELAY);
+	val = ((int16_t)buf[0]<< 8 ) | (buf[1]);
+	float humidity = (( 125 * (float) val ) / 65536 ) - 6;
+
+	return (uint8_t) humidity; //TODO: convert with range -> util.h
 }
 
 uint8_t ws_sensor_atmospheric_pressure() {
@@ -56,6 +63,7 @@ void ws_sensor_read() {
 void ws_sensor_read_task() {
 	while (1) {
 		ws_sensor_read();
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 		vTaskDelay(portTICK_PERIOD_MS * 1000 * 1);
 	}
 }
