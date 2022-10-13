@@ -32,11 +32,25 @@ void MainWindow::on_pushButton_clicked()
 //    dbRef.setPassword("Ab12345!");
 //    dbRef.setDatabaseName("thecrapbox");
 
+    series = new QLineSeries();
+    QChart *chart = new QChart();
+
     if(dbRef.open()){
         QMessageBox::information(this, "Connection", "GREAT SUCCES!");
-        pQueryModel = new QSqlQueryModel();
-        pQueryModel->setQuery("SELECT * FROM opleiding;");
-        ui->tableView->setModel(pQueryModel);
+        QSqlQuery queryGraphData;
+        queryGraphData.exec("SELECT id, temp FROM tblMain LIMIT 16 ORDER BY desc;");
+//        ui->tableView->setModel(pQueryModel);
+        for (int i = 0; queryGraphData.next(); ++i) {
+            series->append(queryGraphData.value(0).toInt(), queryGraphData.value(1).toInt());
+        }
+        chart->legend()->show();
+        chart->addSeries(series);
+        chart->createDefaultAxes();
+        chart->setTitle("Hellow!");
+        chartView = new QChartView(chart);
+
+        MainWindow::setCentralWidget(chartView);
+
     } else {
         QMessageBox::warning(this, "No connection", "Failed to connect");
     }

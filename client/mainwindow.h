@@ -8,6 +8,10 @@
 #include <QMessageBox>
 #include <QtSql>
 #include <QSqlDatabase>
+#include <QtCharts>
+#include <QWidget>
+#include <QWidgetSet>
+
 #include "main.h"
 
 
@@ -36,7 +40,8 @@ private:
     dbConnector *_dbConenctor;
 //    QSqlDatabase db;
 
-    QSqlQueryModel *pQueryModel;
+    QLineSeries *series;
+    QChartView *chartView;
 
 //    Database database;
 };
