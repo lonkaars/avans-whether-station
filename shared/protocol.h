@@ -14,24 +14,54 @@
 #define WS_PROTOCOL_C_SPACE (0x20)
 #define WS_PROTOCOL_C_NULL (0x00)
 
+/**
+ * @brief parsed cmd struct, holds arguments similar to argc and argv provided
+ * to `int main()`
+ */
 typedef struct {
-	int argc;
-	char* argv[];
+	int argc; /** argument count */
+	char* argv[]; /** argument array, null terminated strings */
 } ws_s_protocol_parsed_cmd;
 
+/**
+ * @brief holds parser state variables for `ws_protocol_parse_byte` function.
+ * each incoming tcp request should get it's own parser 'instance'
+ */
 typedef struct {
-	ws_s_protocol_parsed_cmd* target;
-	bool valid;
-	char* cmd;
-	uint16_t cmd_len;
-	uint16_t arg_len;
-	uint16_t args_len[];
+	ws_s_protocol_parsed_cmd* target; /** parsed cmd reference */
+	bool valid; /** command still valid flag */
+	char* cmd; /** raw cmd */
+	uint16_t cmd_len; /** raw cmd string length */
+	uint16_t arg_len; /** amount of arguments */
+	uint16_t args_len[]; /** array of argument lengths */
 } ws_s_protocol_parser_state;
 
-//TODO: document
+/** @brief return values for command handlers */
+typedef enum {
+	WS_PROTOCOL_CMD_RETURN_OK = 0,
+	WS_PROTOCOL_CMD_RETURN_ERROR = 1,
+} ws_e_protocol_cmd_return_value;
+
+/** @brief request response data struct */
+typedef struct {
+	ws_e_protocol_cmd_return_value success;
+	ws_s_bin* msg;
+} ws_s_protocol_response;
+
+/**
+ * @brief allocate parser struct
+ *
+ * @return pointer to newly allocated struct
+ */
 ws_s_protocol_parser_state* ws_protocol_parser_alloc();
+/** @brief deallocate parser struct, automatically frees all child pointers */
 void ws_protocol_parser_free(ws_s_protocol_parser_state* state);
+/**
+ * @brief initialize ws_s_protocol_parsed_cmd struct pointer of
+ * ws_s_protocol_parser_state (internal only)
+ */
 void ws_protocol_cmd_init(ws_s_protocol_parser_state* state);
+/** @brief deallocate ws_s_protocol_parsed_cmd struct pointer (internal only) */
 void ws_protocol_cmd_free(ws_s_protocol_parsed_cmd* cmd);
 
 /**
@@ -53,6 +83,21 @@ void ws_protocol_parse_byte(ws_s_protocol_parser_state* state, char input);
  * @param length  input byte array length
  */
 void ws_protocol_parse_bytes(ws_s_protocol_parser_state* state, char* input, unsigned int length);
+/**
+ * @brief handle complete command
+ *
+ * this function gets called when ws_protocol_parse_byte has detected a
+ * finished command. this function decides which command handler gets called,
+ * given that argv[0] contains a valid command. command argument parsing is
+ * handled by the command handler function.
+ *
+ * @remark [server]
+ *
+ * @return response
+ *
+ * @param parsed_cmd  cmd parsed into ws_s_protocol_parsed_cmd struct
+ */
+ws_s_protocol_response* ws_protocol_parse_finished(ws_s_protocol_parsed_cmd* parsed_cmd);
 
 /**
  * @brief create a `last-records` request command

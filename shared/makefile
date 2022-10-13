@@ -1,7 +1,7 @@
 CC = gcc
 LD = gcc
 RM = rm -f
-CFLAGS =
+CFLAGS = -g
 LFLAGS =
 TARGET = main
 

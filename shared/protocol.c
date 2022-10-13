@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "protocol.h"
 
@@ -12,7 +13,7 @@ void ws_protocol_parse_byte(ws_s_protocol_parser_state* state, char input) {
 
     case WS_PROTOCOL_C_SPACE: {
       if (!state->valid) return;
-      printf("argument delimiter\n");
+			state->arg_len++;
       return;
     }
 
@@ -23,15 +24,39 @@ void ws_protocol_parse_byte(ws_s_protocol_parser_state* state, char input) {
 
     default: {
       if (!state->valid) return;
-      printf("recv byte 0x%02x, (\"%c\")\n", input, input);
       state->cmd[state->cmd_len++] = input;
       state->args_len[state->arg_len] += 1;
       if (state->cmd_len == WS_PROTOCOL_CMD_BUFFER_LEN) state->valid = false;
       return;
     }
   }
+	// arg_len is used as an index while parsing, so add 1 to get length
+	state->arg_len++;
 
-  printf("command done!\n");
+	// parse cmd into argc and argv
+	ws_protocol_cmd_init(state);
+	// create response
+	ws_s_protocol_response* response = ws_protocol_parse_finished(state->target);
+
+	//TODO: send response
+	
+	free(response->msg);
+	free(response);
+
+	return;
+}
+
+ws_s_protocol_response* ws_protocol_parse_finished(ws_s_protocol_parsed_cmd* parsed_cmd) {
+	ws_s_protocol_response* response = malloc(sizeof(ws_s_protocol_response));
+
+	if (strncmp("last-records", parsed_cmd->argv[0], 12) == 0) {
+		printf("last-records found!\n");
+	}
+
+	response->msg = ws_bin_s_alloc(50);
+	strncpy((char*) response->msg->data, "hello world!\n\0", 14);
+
+	return response;
 }
 
 void ws_protocol_parse_bytes(ws_s_protocol_parser_state* state, char* input, unsigned int length) {
@@ -51,8 +76,16 @@ ws_s_protocol_parser_state* ws_protocol_parser_alloc() {
 void ws_protocol_cmd_init(ws_s_protocol_parser_state* state) {
   state->target = malloc(sizeof(ws_s_protocol_parsed_cmd) + sizeof(char*) * state->arg_len);
   for (unsigned int i = 0; i < state->arg_len; i++)
-    state->target->argv[i] = malloc(sizeof(char) * state->args_len[i]);
+    state->target->argv[i] = malloc(sizeof(char) * (state->args_len[i] + 1));
+
   state->target->argc = state->arg_len;
+
+	unsigned int head = 0;
+	for (unsigned int i = 0; i < state->arg_len; i++) {
+		strncpy(state->target->argv[i], &state->cmd[head], state->args_len[i]);
+		state->target->argv[i][state->args_len[i]] = 0x00; // terminate argument with null byte
+		head += state->args_len[i];
+	}
 }
 
 void ws_protocol_parser_free(ws_s_protocol_parser_state* state) {
@@ -63,6 +96,7 @@ void ws_protocol_parser_free(ws_s_protocol_parser_state* state) {
   state = NULL;
   return;
 }
+
 void ws_protocol_cmd_free(ws_s_protocol_parsed_cmd* cmd) {
   for (unsigned int i = 0; i < cmd->argc; i++)
     free(cmd->argv[i]);
