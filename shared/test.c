@@ -45,6 +45,7 @@ int main() {
   }
 
   ws_protocol_parser_free(parser1);
+	parser1 = NULL;
 
   return 0;
 }

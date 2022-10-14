@@ -56,6 +56,8 @@ typedef struct {
 ws_s_protocol_parser_state* ws_protocol_parser_alloc();
 /** @brief deallocate parser struct, automatically frees all child pointers */
 void ws_protocol_parser_free(ws_s_protocol_parser_state* state);
+/** @brief reset parser state to parse a new request */
+void ws_protocol_parser_reset(ws_s_protocol_parser_state* state);
 /**
  * @brief initialize ws_s_protocol_parsed_cmd struct pointer of
  * ws_s_protocol_parser_state (internal only)
