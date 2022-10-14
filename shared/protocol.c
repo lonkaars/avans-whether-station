@@ -39,9 +39,18 @@ void ws_protocol_parse_byte(ws_s_protocol_parser_state* state, char input) {
 	ws_s_protocol_response* response = ws_protocol_parse_finished(state->target);
 
 	//TODO: send response
+	char response_first_line[16];
+	sprintf(response_first_line, "%s,%x\n", response->success == WS_PROTOCOL_CMD_RETURN_OK ? "ok" : "error", response->msg->bytes);
+	ws_s_bin* response_first_line_bin = ws_bin_s_alloc(strlen(response_first_line));
+	strncpy((char*) response_first_line_bin->data, response_first_line, strlen(response_first_line));
+	ws_protocol_send_data(response_first_line_bin);
+	ws_protocol_send_data(response->msg);
 	
+	free(response_first_line_bin);
 	free(response->msg);
 	free(response);
+
+	//TODO: reset command in parser_state for next command
 
 	return;
 }

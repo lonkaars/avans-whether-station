@@ -119,6 +119,15 @@ ws_s_bin* ws_protocol_req_last_records(unsigned int record_amount);
  */
 void ws_protocol_res_last_records(ws_s_protocol_parsed_cmd* parsed_cmd, ws_s_protocol_response* response);
 
+/**
+ * @brief data sender wrapper
+ *
+ * this function should be implemented in the source files of each target
+ * platform, as the send interface will be different on desktop and on the
+ * stm32.
+ */
+void ws_protocol_send_data(ws_s_bin* data);
+
 /** @brief cmd codes (used to call handlers) */
 typedef enum {
 	WS_PROTOCOL_CMD_UNKNOWN = -1,

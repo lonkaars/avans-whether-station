@@ -3,11 +3,25 @@
 #include <unistd.h>
 #include <termios.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include "protocol.h"
 
 void ws_protocol_res_last_records(ws_s_protocol_parsed_cmd* parsed_cmd, ws_s_protocol_response* response) {
-	printf("last-records detected!\n");
+	const char* response_text = ""
+		"id,temperature,humidity,atmospheric_pressure\n"
+		"10dc,2f,c5,7f\n"
+		"10dd,30,c6,7f\n"
+		"10de,31,c7,7f\n"
+		"10df,35,ca,7e\n"
+		"10e0,34,c9,7e\n";
+	response->success = WS_PROTOCOL_CMD_RETURN_OK;
+	response->msg = ws_bin_s_alloc(strlen(response_text));
+	strncpy((char*) response->msg->data, response_text, strlen(response_text));
+}
+
+void ws_protocol_send_data(ws_s_bin* data) {
+	printf("%.*s", data->bytes, data->data);
 }
 
 int main() {
