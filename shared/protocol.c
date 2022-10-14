@@ -46,16 +46,32 @@ void ws_protocol_parse_byte(ws_s_protocol_parser_state* state, char input) {
 	return;
 }
 
+#define WS_CMD_MAP(parsed_cmd, name, code) \
+	if (strlen(parsed_cmd->argv[0]) == strlen(name) && strncmp(parsed_cmd->argv[0], name, strlen(name)) == 0) return code;
+
+static ws_e_protocol_cmd ws_protocol_get_cmd_code(ws_s_protocol_parsed_cmd* parsed_cmd) {
+	WS_CMD_MAP(parsed_cmd, "last-records", WS_PROTOCOL_CMD_LAST_RECORDS);
+
+	return WS_PROTOCOL_CMD_UNKNOWN;
+}
+
 ws_s_protocol_response* ws_protocol_parse_finished(ws_s_protocol_parsed_cmd* parsed_cmd) {
 	ws_s_protocol_response* response = malloc(sizeof(ws_s_protocol_response));
+	response->success = WS_PROTOCOL_CMD_RETURN_ERROR;
+	response->msg = NULL;
 
-	if (strncmp("last-records", parsed_cmd->argv[0], 12) == 0) {
-		printf("last-records found!\n");
-	}
+	ws_e_protocol_cmd cmd_code = ws_protocol_get_cmd_code(parsed_cmd);
+	if (cmd_code == WS_PROTOCOL_CMD_UNKNOWN) goto ws_protocol_parse_exit;
+	if (cmd_code >= WS_PROTOCOL_CMD_AMOUNT) goto ws_protocol_parse_exit;
 
-	response->msg = ws_bin_s_alloc(50);
-	strncpy((char*) response->msg->data, "hello world!\n\0", 14);
+	void (*ws_protocol_res_handler)(ws_s_protocol_parsed_cmd*, ws_s_protocol_response*) =
+		g_ws_protocol_res_handlers[cmd_code];
+	if (ws_protocol_res_handler == NULL) goto ws_protocol_parse_exit;
+	(*ws_protocol_res_handler)(parsed_cmd, response);
 
+ws_protocol_parse_exit:
+
+	if (response->msg == NULL) response->msg = ws_bin_s_alloc(0);
 	return response;
 }
 

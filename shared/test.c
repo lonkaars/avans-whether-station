@@ -6,8 +6,8 @@
 
 #include "protocol.h"
 
-ws_s_bin* ws_protocol_res_last_records(ws_s_protocol_parsed_cmd* parsed_cmd) {
-  return NULL;
+void ws_protocol_res_last_records(ws_s_protocol_parsed_cmd* parsed_cmd, ws_s_protocol_response* response) {
+	printf("last-records detected!\n");
 }
 
 int main() {

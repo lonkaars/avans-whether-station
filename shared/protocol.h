@@ -115,16 +115,19 @@ ws_s_bin* ws_protocol_req_last_records(unsigned int record_amount);
  * command, and returns the response string
  *
  * @param parsed_cmd  complete parsed command from ws_protocol_parse_*
- *
- * @return ws_s_bin containing response string
+ * @param response  response struct with uninitialized pointer to msg
  */
-ws_s_bin* ws_protocol_res_last_records(ws_s_protocol_parsed_cmd* parsed_cmd);
+void ws_protocol_res_last_records(ws_s_protocol_parsed_cmd* parsed_cmd, ws_s_protocol_response* response);
 
+/** @brief cmd codes (used to call handlers) */
 typedef enum {
+	WS_PROTOCOL_CMD_UNKNOWN = -1,
+
 	WS_PROTOCOL_CMD_LAST_RECORDS = 0,
 } ws_e_protocol_cmd;
 
-static ws_s_bin* (*g_ws_protocol_res_handlers[WS_PROTOCOL_CMD_AMOUNT])(ws_s_protocol_parsed_cmd* parsed_cmd) = {
+/** @brief response handlers, called when a command is parsed */
+static void (*g_ws_protocol_res_handlers[WS_PROTOCOL_CMD_AMOUNT])(ws_s_protocol_parsed_cmd*, ws_s_protocol_response*) = {
 	[WS_PROTOCOL_CMD_LAST_RECORDS] = &ws_protocol_res_last_records
 };
 
