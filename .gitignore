@@ -7,5 +7,6 @@ stm32f091/main.bin
 client/makefile
 client/client
 client/moc_*
+shared/main
 .qmake.stash
 .vscode/.cortex-debug.registers.state.json
