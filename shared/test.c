@@ -7,7 +7,7 @@
 
 #include "protocol.h"
 
-void ws_protocol_res_last_records(ws_s_protocol_parsed_cmd* parsed_cmd, ws_s_protocol_response* response) {
+void ws_protocol_res_last_records(ws_s_protocol_parsed_req_cmd* parsed_cmd, ws_s_protocol_res* response) {
 	const char* response_text = ""
 		"id,temperature,humidity,atmospheric_pressure\n"
 		"10dc,2f,c5,7f\n"
@@ -34,17 +34,15 @@ int main() {
   term.c_cc[VMIN] = 1;
   tcsetattr(STDIN_FILENO, 0, &term);
 
-  ws_s_protocol_parser_state* parser1 = ws_protocol_parser_alloc();
+  ws_s_protocol_req_parser_state* parser1 = ws_protocol_req_parser_alloc();
 
-  for(;;) {
-    fflush(stdout);
+	fflush(stdout);
 
-    char byte;
-    while(read(STDIN_FILENO, &byte, 1) > 0)
-      ws_protocol_parse_byte(parser1, byte);
-  }
+	char byte;
+	while(read(STDIN_FILENO, &byte, 1) > 0)
+		ws_protocol_parse_req_byte(parser1, byte);
 
-  ws_protocol_parser_free(parser1);
+	ws_protocol_req_parser_free(parser1);
 	parser1 = NULL;
 
   return 0;
