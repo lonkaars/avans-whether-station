@@ -29,8 +29,9 @@ conventions.
 Returns the last `n` records in csv format. The first line has the csv table
 header, with the fields `id`, `temperature`, `humidity`, and
 `atmospheric_pressure`. The rest of the response consists of 1 record per line.
-When `n` is 0, or no records exist yet, the csv header is still returned, but
-without any records.
+The amount of records is limited to the amount of valid records in the backlog
+buffer. When the amount of returned records is 0, the response consists of the
+csv header, but without any following records.
 
 ## Example transaction
 
@@ -39,7 +40,7 @@ starting with `<`, and response by lines starting with `>`.
 
 ```
 < last-records 5<0a>
-> ok,115<0a>
+> ok,73<0a>
 > id,temperature,humidity,atmospheric_pressure<0a>
 > 10dc,2f,c5,7f<0a>
 > 10dd,30,c6,7f<0a>

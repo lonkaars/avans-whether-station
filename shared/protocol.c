@@ -15,30 +15,30 @@ static ws_e_protocol_cmd ws_protocol_get_req_cmd_code(ws_s_protocol_parsed_req_c
 }
 
 void ws_protocol_parse_req_byte(ws_s_protocol_req_parser_state* state, char input) {
-  switch(input) {
-    case WS_PROTOCOL_C_EOL: {
-      break;
-    }
+	switch(input) {
+		case WS_PROTOCOL_C_EOL: {
+			break;
+		}
 
-    case WS_PROTOCOL_C_SPACE: {
-      if (!state->valid) return;
+		case WS_PROTOCOL_C_SPACE: {
+			if (!state->valid) return;
 			state->arg_len++;
-      return;
-    }
+			return;
+		}
 
-    case WS_PROTOCOL_C_NULL: {
-      state->valid = false;
-      return;
-    }
+		case WS_PROTOCOL_C_NULL: {
+			state->valid = false;
+			return;
+		}
 
-    default: {
-      if (!state->valid) return;
-      state->cmd[state->cmd_len++] = input;
-      state->args_len[state->arg_len] += 1;
-      if (state->cmd_len == WS_PROTOCOL_CMD_BUFFER_LEN) state->valid = false;
-      return;
-    }
-  }
+		default: {
+			if (!state->valid) return;
+			state->cmd[state->cmd_len++] = input;
+			state->args_len[state->arg_len] += 1;
+			if (state->cmd_len == WS_PROTOCOL_CMD_BUFFER_LEN) state->valid = false;
+			return;
+		}
+	}
 	// arg_len is used as an index while parsing, so add 1 to get length
 	state->arg_len++;
 
@@ -85,22 +85,23 @@ ws_protocol_parse_exit:
 }
 
 void ws_protocol_parse_req_bytes(ws_s_protocol_req_parser_state* state, char* input, unsigned int length) {
-  for (unsigned int i = 0; i < length; i++) ws_protocol_parse_req_byte(state, input[i]);
+	for (unsigned int i = 0; i < length; i++) ws_protocol_parse_req_byte(state, input[i]);
 }
 
 ws_s_protocol_req_parser_state* ws_protocol_req_parser_alloc() {
-  ws_s_protocol_req_parser_state* parser_state = malloc(sizeof(ws_s_protocol_req_parser_state) + sizeof(uint16_t) * WS_PROTOCOL_CMD_MAX_ARGUMENTS);
-  parser_state->cmd = malloc(sizeof(char) * WS_PROTOCOL_CMD_BUFFER_LEN);
+	ws_s_protocol_req_parser_state* parser_state = malloc(sizeof(ws_s_protocol_req_parser_state) + sizeof(uint16_t) * WS_PROTOCOL_CMD_MAX_ARGUMENTS);
+	parser_state->cmd = malloc(sizeof(char) * WS_PROTOCOL_CMD_BUFFER_LEN);
+	parser_state->target = NULL;
 	ws_protocol_req_parser_reset(parser_state);
-  return parser_state;
+	return parser_state;
 }
 
 void ws_protocol_req_cmd_init(ws_s_protocol_req_parser_state* state) {
-  state->target = malloc(sizeof(ws_s_protocol_parsed_req_cmd) + sizeof(char*) * state->arg_len);
-  for (unsigned int i = 0; i < state->arg_len; i++)
-    state->target->argv[i] = malloc(sizeof(char) * (state->args_len[i] + 1));
+	state->target = malloc(sizeof(ws_s_protocol_parsed_req_cmd) + sizeof(char*) * state->arg_len);
+	for (unsigned int i = 0; i < state->arg_len; i++)
+		state->target->argv[i] = malloc(sizeof(char) * (state->args_len[i] + 1));
 
-  state->target->argc = state->arg_len;
+	state->target->argc = state->arg_len;
 
 	unsigned int head = 0;
 	for (unsigned int i = 0; i < state->arg_len; i++) {
@@ -111,26 +112,26 @@ void ws_protocol_req_cmd_init(ws_s_protocol_req_parser_state* state) {
 }
 
 void ws_protocol_req_parser_free(ws_s_protocol_req_parser_state* state) {
-  if (state == NULL) return;
-  if (state->target != NULL) ws_protocol_req_cmd_free(state->target);
+	if (state == NULL) return;
+	if (state->target != NULL) ws_protocol_req_cmd_free(state->target);
 	state->target = NULL;
-  free(state->cmd);
-  free(state);
-  return;
+	free(state->cmd);
+	free(state);
+	return;
 }
 
 void ws_protocol_req_parser_reset(ws_s_protocol_req_parser_state* state) {
 	if (state->target != NULL) ws_protocol_req_cmd_free(state->target);
-  state->target = NULL;
-  state->valid = true;
-  state->cmd_len = 0;
-  state->arg_len = 0;
+	state->target = NULL;
+	state->valid = true;
+	state->cmd_len = 0;
+	state->arg_len = 0;
 	memset(state->args_len, 0, sizeof(uint16_t) * WS_PROTOCOL_CMD_MAX_ARGUMENTS);
 }
 
 void ws_protocol_req_cmd_free(ws_s_protocol_parsed_req_cmd* cmd) {
-  for (unsigned int i = 0; i < cmd->argc; i++)
-    free(cmd->argv[i]);
-  free(cmd);
-  return;
+	for (int i = 0; i < cmd->argc; i++)
+		free(cmd->argv[i]);
+	free(cmd);
+	return;
 }

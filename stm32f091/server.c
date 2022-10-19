@@ -28,7 +28,7 @@ void ws_server_demo() {
 	uint8_t receive[24]={0};
 	uint8_t sendToQTData[]="gelukt";
 	uint8_t test[]="test";
-	int ret;
+	//int ret;
 	//ATsendCommand(sendToQTData);
 		while (1)
 		{

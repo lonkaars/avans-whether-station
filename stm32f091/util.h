@@ -6,10 +6,11 @@
 #include <string.h>
 
 #include "setup.h"
+#include "../shared/util.h"
 
 #define ws_usb_printf(fmt, ...) { \
 	char temp[255]; \
-	sprintf(temp, fmt, ##__VA_ARGS__); \
+	snprintf(temp, 255, fmt, ##__VA_ARGS__); \
 	HAL_UART_Transmit(&huart2, (uint8_t*) temp, sizeof(char) * strlen(temp), HAL_MAX_DELAY); \
 }
 

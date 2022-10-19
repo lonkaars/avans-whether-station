@@ -33,11 +33,6 @@ ws_s_backlog_record* ws_backlog_get_last_record(uint16_t record_offset) {
 	return ws_backlog_get_record((g_ws_backlog_database->buffer_end - record_offset - 1) % g_ws_backlog_database->buffer_size);
 }
 
-static uint16_t mod(uint16_t a, uint16_t b) {
-	uint16_t m = a % b;
-	return m < 0 ? (b < 0) ? m - b : m + b : m;
-}
-
 uint16_t ws_backlog_get_record_count() {
 	// add buffer_size to the result of the modulo operation if it's result is negative
 	// (only works when buffer_size is less than 2^15)

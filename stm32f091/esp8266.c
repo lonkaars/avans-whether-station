@@ -22,7 +22,7 @@ void ws_esp8266_ATsendCommand(uint8_t* data){
 }
 int ws_esp8266_checkOK(uint8_t *receiveData,int length){
 	 char *ret="";
-	 char *ret1="";
+	 // char *ret1="";
 	 HAL_UART_Transmit(&huart2, receiveData,length,1000);
  	 ret = strstr((char*)receiveData,"OK");
  	// ret = strstr((char*)receiveData,"change");
@@ -159,8 +159,9 @@ void ws_esp8266_serveraan(){
 	HAL_Delay(1000);
 }
 void ws_esp8266_serveruit(){
-	int ret;
-	uint8_t buffer1[27]={0};	uint8_t Tx_server[]="AT+CIPSERVER=0\r\n";
+	//int ret;
+	//uint8_t buffer1[27]={0};
+	uint8_t Tx_server[]="AT+CIPSERVER=0\r\n";
 //
 //	while(ret!=1){
 

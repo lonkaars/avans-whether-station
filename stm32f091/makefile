@@ -5,6 +5,8 @@ RM = rm -f
 
 TARGET = main
 
+include ../shared/shared.mk
+
 SHARED_FLAGS += -g
 SHARED_FLAGS += -DSTM32F091xC
 SHARED_FLAGS += -Wall
@@ -74,7 +76,13 @@ $(TARGET).bin: $(TARGET).elf
 %.o: %.s
 	$(CC) -c $(AFLAGS) $< -o $@
 
+lib/%.o: lib/%.c
+	$(CC) -c $(CFLAGS) -w $< -o $@
+
 %.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+%-stm.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 $(TARGET).elf: $(OBJS)
