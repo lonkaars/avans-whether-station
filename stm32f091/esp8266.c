@@ -5,6 +5,7 @@
 
 #include "esp8266.h"
 #include "setup.h"
+#include "consts.h"
 
 void ws_esp8266_ATsendCommand(uint8_t* data){
 	char dataChar[20];
@@ -126,7 +127,7 @@ void ws_esp8266_mode(){
 	HAL_Delay(1000);
 }
 void ws_esp8266_connect(){
-		uint8_t Tx_network[]="AT+CWJAP=\"Test\",\"12345678\"\r\n";
+		uint8_t Tx_network[]="AT+CWJAP=\"" WS_ESP8266_WLAN_SSID "\",\"" WS_ESP8266_WLAN_PASSWD "\"\r\n";
 
 
 		HAL_UART_Transmit(&huart1, Tx_network,strlen((char*)Tx_network),1000);
