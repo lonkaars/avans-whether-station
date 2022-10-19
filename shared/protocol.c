@@ -4,6 +4,16 @@
 
 #include "protocol.h"
 
+#define WS_CMD_MAP(parsed_cmd, name, code) \
+	if (strlen(parsed_cmd->argv[0]) == strlen(name) && strncmp(parsed_cmd->argv[0], name, strlen(name)) == 0) return code;
+
+static ws_e_protocol_cmd ws_protocol_get_req_cmd_code(ws_s_protocol_parsed_req_cmd* parsed_cmd) {
+	if (parsed_cmd == NULL) return WS_PROTOCOL_CMD_UNKNOWN; // invalid command
+	WS_CMD_MAP(parsed_cmd, "last-records", WS_PROTOCOL_CMD_LAST_RECORDS);
+
+	return WS_PROTOCOL_CMD_UNKNOWN;
+}
+
 void ws_protocol_parse_req_byte(ws_s_protocol_req_parser_state* state, char input) {
   switch(input) {
     case WS_PROTOCOL_C_EOL: {
@@ -43,7 +53,8 @@ void ws_protocol_parse_req_byte(ws_s_protocol_req_parser_state* state, char inpu
 	ws_s_bin* response_first_line_bin = ws_bin_s_alloc(strlen(response_first_line));
 	strncpy((char*) response_first_line_bin->data, response_first_line, strlen(response_first_line));
 	ws_protocol_send_data(response_first_line_bin);
-	ws_protocol_send_data(response->msg);
+	if (!response->csh) ws_protocol_send_data(response->msg);
+	else (*g_ws_protocol_res_handlers[response->cmd_code])(state->target, response, true);
 	
 	// free response data containers
 	free(response_first_line_bin);
@@ -56,29 +67,19 @@ void ws_protocol_parse_req_byte(ws_s_protocol_req_parser_state* state, char inpu
 	return;
 }
 
-#define WS_CMD_MAP(parsed_cmd, name, code) \
-	if (strlen(parsed_cmd->argv[0]) == strlen(name) && strncmp(parsed_cmd->argv[0], name, strlen(name)) == 0) return code;
-
-static ws_e_protocol_cmd ws_protocol_get_req_cmd_code(ws_s_protocol_parsed_req_cmd* parsed_cmd) {
-	if (parsed_cmd == NULL) return WS_PROTOCOL_CMD_UNKNOWN; // invalid command
-	WS_CMD_MAP(parsed_cmd, "last-records", WS_PROTOCOL_CMD_LAST_RECORDS);
-
-	return WS_PROTOCOL_CMD_UNKNOWN;
-}
-
 ws_s_protocol_res* ws_protocol_parse_req_finished(ws_s_protocol_parsed_req_cmd* parsed_cmd) {
 	ws_s_protocol_res* response = malloc(sizeof(ws_s_protocol_res));
 	response->success = WS_PROTOCOL_CMD_RETURN_ERROR;
+	response->csh = false;
 	response->msg = NULL;
+	response->cmd_code = ws_protocol_get_req_cmd_code(parsed_cmd);
 
-	ws_e_protocol_cmd cmd_code = ws_protocol_get_req_cmd_code(parsed_cmd);
-	if (cmd_code == WS_PROTOCOL_CMD_UNKNOWN) goto ws_protocol_parse_exit;
-	if (cmd_code >= WS_PROTOCOL_CMD_AMOUNT) goto ws_protocol_parse_exit;
+	if (response->cmd_code == WS_PROTOCOL_CMD_UNKNOWN) goto ws_protocol_parse_exit;
+	if (response->cmd_code >= WS_PROTOCOL_CMD_AMOUNT) goto ws_protocol_parse_exit;
 
-	void (*ws_protocol_res_handler)(ws_s_protocol_parsed_req_cmd*, ws_s_protocol_res*) =
-		g_ws_protocol_res_handlers[cmd_code];
+	ws_protocol_res_handler_t* ws_protocol_res_handler = g_ws_protocol_res_handlers[response->cmd_code];
 	if (ws_protocol_res_handler == NULL) goto ws_protocol_parse_exit;
-	(*ws_protocol_res_handler)(parsed_cmd, response);
+	(*ws_protocol_res_handler)(parsed_cmd, response, false);
 
 ws_protocol_parse_exit:
 

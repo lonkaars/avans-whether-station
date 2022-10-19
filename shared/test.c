@@ -7,7 +7,7 @@
 
 #include "protocol.h"
 
-void ws_protocol_res_last_records(ws_s_protocol_parsed_req_cmd* parsed_cmd, ws_s_protocol_res* response) {
+void ws_protocol_res_last_records(ws_s_protocol_parsed_req_cmd* parsed_cmd, ws_s_protocol_res* response, bool send) {
 	const char* response_text = ""
 		"id,temperature,humidity,atmospheric_pressure\n"
 		"10dc,2f,c5,7f\n"
@@ -15,9 +15,18 @@ void ws_protocol_res_last_records(ws_s_protocol_parsed_req_cmd* parsed_cmd, ws_s
 		"10de,31,c7,7f\n"
 		"10df,35,ca,7e\n"
 		"10e0,34,c9,7e\n";
-	response->success = WS_PROTOCOL_CMD_RETURN_OK;
-	response->msg = ws_bin_s_alloc(strlen(response_text));
-	strncpy((char*) response->msg->data, response_text, strlen(response_text));
+
+	if (!send) {
+		response->success = WS_PROTOCOL_CMD_RETURN_OK;
+		response->csh = true;
+		response->msg = ws_bin_s_alloc(0);
+		response->msg->bytes = strlen(response_text);
+	} else {
+		// example send routine
+		ws_s_bin* response_test = ws_bin_s_alloc(strlen(response_text));
+		strncpy((char*) response_test->data, response_text, strlen(response_text));
+		ws_protocol_send_data(response_test);
+	}
 }
 
 void ws_protocol_send_data(ws_s_bin* data) {

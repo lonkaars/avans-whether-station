@@ -42,10 +42,22 @@ typedef enum {
 	WS_PROTOCOL_CMD_RETURN_ERROR = 1,
 } ws_e_protocol_cmd_return_value;
 
+/** @brief cmd codes (used to call handlers) */
+typedef enum {
+	WS_PROTOCOL_CMD_UNKNOWN = -1,
+
+	WS_PROTOCOL_CMD_LAST_RECORDS = 0,
+} ws_e_protocol_cmd;
+
 /** @brief request response data struct */
 typedef struct {
-	ws_e_protocol_cmd_return_value success;
-	ws_s_bin* msg;
+	ws_e_protocol_cmd_return_value success; /** status code for response
+																						validity, defaults to
+																						WS_PROTOCOL_CMD_RETURN_ERROR */
+	bool csh; /** whether the response handler has logic for a custom send
+							handler, false by default */
+	ws_s_bin* msg; /** pointer to response data, uninitialized by default */
+	ws_e_protocol_cmd cmd_code; /** cmd code */
 } ws_s_protocol_res;
 
 /**
@@ -102,15 +114,22 @@ ws_s_protocol_res* ws_protocol_parse_req_finished(ws_s_protocol_parsed_req_cmd* 
 ws_s_bin* ws_protocol_req_last_records(unsigned int record_amount);
 
 /**
- * @brief `last-records` response handler
+ * @brief response handler
  *
- * gets fired when the weather station receives a complete `last-records`
- * command, and returns the response string
+ * gets fired when the weather station receives a complete command, and returns
+ * a response struct with a success code and an optional message. if
+ * response->csh is set to `true` within the handler, it gets fired a second
+ * time after the response header is sent, but with the `send` parameter set to
+ * `true`. this is so response handlers can send large amounts of data without
+ * allocating large areas of memory.
  *
  * @param parsed_cmd  complete parsed command from ws_protocol_parse_req_*
  * @param response  response struct with uninitialized pointer to msg
+ * @param send  `false` on first run, `true` on second run if `response->csh` was set to true
  */
-void ws_protocol_res_last_records(ws_s_protocol_parsed_req_cmd* parsed_cmd, ws_s_protocol_res* response);
+typedef void ws_protocol_res_handler_t(ws_s_protocol_parsed_req_cmd*, ws_s_protocol_res*, bool);
+
+ws_protocol_res_handler_t ws_protocol_res_last_records;
 
 /**
  * @brief data sender wrapper
@@ -121,15 +140,8 @@ void ws_protocol_res_last_records(ws_s_protocol_parsed_req_cmd* parsed_cmd, ws_s
  */
 void ws_protocol_send_data(ws_s_bin* data);
 
-/** @brief cmd codes (used to call handlers) */
-typedef enum {
-	WS_PROTOCOL_CMD_UNKNOWN = -1,
-
-	WS_PROTOCOL_CMD_LAST_RECORDS = 0,
-} ws_e_protocol_cmd;
-
 /** @brief response handlers, called when a command is parsed */
-static void (*g_ws_protocol_res_handlers[WS_PROTOCOL_CMD_AMOUNT])(ws_s_protocol_parsed_req_cmd*, ws_s_protocol_res*) = {
-	[WS_PROTOCOL_CMD_LAST_RECORDS] = &ws_protocol_res_last_records
+static ws_protocol_res_handler_t* g_ws_protocol_res_handlers[WS_PROTOCOL_CMD_AMOUNT] = {
+	[WS_PROTOCOL_CMD_LAST_RECORDS] = &ws_protocol_res_last_records,
 };
 
