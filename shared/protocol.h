@@ -137,8 +137,11 @@ ws_protocol_res_handler_t ws_protocol_res_last_records;
  * this function should be implemented in the source files of each target
  * platform, as the send interface will be different on desktop and on the
  * stm32.
+ *
+ * @param data  pointer to data char array
+ * @param length  length of data array
  */
-void ws_protocol_send_data(ws_s_bin* data);
+void ws_protocol_send_data(const char* data, unsigned int length);
 
 /** @brief response handlers, called when a command is parsed */
 static ws_protocol_res_handler_t* g_ws_protocol_res_handlers[WS_PROTOCOL_CMD_AMOUNT] = {
