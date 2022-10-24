@@ -48,6 +48,7 @@ int ws_esp8266_receivingMsg(uint8_t *receiveData,int length){
 	 HAL_UART_Transmit(&huart2, receiveData,length,1000);
  	 ret = strstr((char*)receiveData,"+IPD");
  	// memset(receiveData,0,30);
+  
  	 if((ret[0]='+') && (ret[1]=='I')){
  		//HAL_UART_Transmit(&huart2, (uint8_t*)ret, sizeof(ret), 100);
  		return 1;
@@ -75,13 +76,12 @@ int ws_esp8266_unlink(uint8_t *receiveData,int length){
 }
 
 void ws_esp8266_StartEsp(){
-
 	uint8_t Tx_AT[]="AT\r\n";
 	uint8_t Rx_buffer[10]={0};
 	for(int i=0;i<3;i++){
    // HAL_UART_Transmit(&huart2, hier,sizeof(hier),100);
-    HAL_UART_Transmit_IT(&huart1, Tx_AT,strlen((char*)Tx_AT));
-	HAL_UART_Receive_IT(&huart1, Rx_buffer, 10);
+    HAL_UART_Transmit(&huart1, Tx_AT,strlen((char*)Tx_AT), 100);
+	HAL_UART_Receive(&huart1, Rx_buffer, 10, 100);
 
 
  	HAL_UART_Transmit(&huart2, Rx_buffer,10,100);
@@ -95,8 +95,8 @@ void ws_esp8266_disconnect(){
 	uint8_t Tx_disconnect[]="AT+CWQAP\r\n";uint8_t buffer[17]={0};
 	while(ret!=1){
 
-	    HAL_UART_Transmit_IT(&huart1, Tx_disconnect,strlen((char*)Tx_disconnect));
-		HAL_UART_Receive_IT(&huart1, buffer, 17);
+	    HAL_UART_Transmit(&huart1, Tx_disconnect,strlen((char*)Tx_disconnect), 100);
+		HAL_UART_Receive(&huart1, buffer, 17, 100);
 		HAL_Delay(2000);
 
 		if(ws_esp8266_checkOK(buffer,17)==1){
@@ -113,8 +113,8 @@ void ws_esp8266_mode(){
 
 	while(ret!=1){
 
-	    HAL_UART_Transmit_IT(&huart1, Tx_mode,strlen((char*)Tx_mode));
-		HAL_UART_Receive_IT(&huart1, buffer1, 20);
+	    HAL_UART_Transmit(&huart1, Tx_mode,strlen((char*)Tx_mode), 100);
+		HAL_UART_Receive(&huart1, buffer1, 20, 100);
 		HAL_Delay(1000);
 
 		if(ws_esp8266_checkOK(buffer1,20)==1){
@@ -142,12 +142,12 @@ void ws_esp8266_connect(){
 }
 void ws_esp8266_serveraan(){
 	int ret;
-	uint8_t buffer1[30]={0};	uint8_t Tx_server[]="AT+CIPSERVER=1,80\r\n";
+	uint8_t buffer1[30]={0};	uint8_t Tx_server[]="AT+CIPSERVER=1," WS_SERVER_PORT "\r\n";
 
 	while(ret!=1){
 
-	    HAL_UART_Transmit_IT(&huart1, Tx_server,strlen((char*)Tx_server));
-		HAL_UART_Receive_IT(&huart1, buffer1, 30);
+	    HAL_UART_Transmit(&huart1, Tx_server,strlen((char*)Tx_server), 100);
+		HAL_UART_Receive(&huart1, buffer1, 30, 100);
 		HAL_Delay(2000);
 
 		if(ws_esp8266_checkOK(buffer1,30)==1){
@@ -166,8 +166,8 @@ void ws_esp8266_serveruit(){
 //
 //	while(ret!=1){
 
-	    HAL_UART_Transmit_IT(&huart1, Tx_server,strlen((char*)Tx_server));
-//		HAL_UART_Receive_IT(&huart1, buffer1, 27);
+	    HAL_UART_Transmit(&huart1, Tx_server,strlen((char*)Tx_server), 100);
+//		HAL_UART_Receive(&huart1, buffer1, 27, 100);
 		HAL_Delay(3000);
 
 //		if(unlink(buffer1,27)==1){
@@ -185,8 +185,8 @@ void ws_esp8266_mux(){
 
 	while(ret!=1){
 
-	    HAL_UART_Transmit_IT(&huart1, Tx_mux,strlen((char*)Tx_mux));
-		HAL_UART_Receive_IT(&huart1, buffer2, 20);
+	    HAL_UART_Transmit(&huart1, Tx_mux,strlen((char*)Tx_mux), 100);
+		HAL_UART_Receive(&huart1, buffer2, 20, 100);
 		HAL_Delay(2000);
 
 		if(ws_esp8266_checkOK(buffer2,20)==1){
@@ -203,7 +203,7 @@ void ws_esp8266_close(){
 	uint8_t Tx_close[]="AT+CIPCLOSE=0\r\n";
 
 
-	    HAL_UART_Transmit_IT(&huart1, Tx_close,strlen((char*)Tx_close));
+	    HAL_UART_Transmit(&huart1, Tx_close,strlen((char*)Tx_close), 100);
 
 		HAL_Delay(3000);
 

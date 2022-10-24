@@ -2,6 +2,8 @@
 
 #include "wifi.h"
 
+#define WS_SERVER_PORT "80"
+
 #define WS_PINOUT_I2C_SDA_PIN GPIO_PIN_9
 #define WS_PINOUT_I2C_SDA_PORT GPIOB
 #define WS_PINOUT_I2C_SCL_PIN GPIO_PIN_8
