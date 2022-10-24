@@ -6,7 +6,6 @@
 //#include <QtSql>
 //#include <QSqlDatabase>
 
-//#include "database.h"
 
 namespace Ui {
 class dbConnector;
@@ -21,7 +20,6 @@ public:
     ~dbConnector();
 
 private slots:
-//    void on_pushButton_clicked();
 
     void on_pushButton_cancel_clicked();
 
@@ -29,6 +27,4 @@ private slots:
 
 private:
     Ui::dbConnector *ui;
-
-//    Database database;
 };

@@ -34,14 +34,15 @@ private slots:
 
     void on_actionConnection_triggered();
 
+    void on_actionRefresh_triggered();
+
 private:
     Ui::MainWindow *ui;
 
     dbConnector *_dbConenctor;
-//    QSqlDatabase db;
 
-    QLineSeries *series;
-    QChartView *chartView;
+    QChart *_pChart;
+//    QLineSeries *_pSeries;
+    QChartView *_pChartView;
 
-//    Database database;
 };
