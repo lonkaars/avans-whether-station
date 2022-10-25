@@ -30,6 +30,7 @@ void MainWindow::on_actionRefresh_triggered()
 {
     QLineSeries *seriesTemperature = new QLineSeries();
     QLineSeries *seriesHumidity = new QLineSeries();
+    QLineSeries *seriesPressure = new QLineSeries();
     _pChart = new QChart();
 
     if(dbRef.open()){
@@ -41,11 +42,13 @@ void MainWindow::on_actionRefresh_triggered()
 //            seriesTemp->append(queryGraphData.value(0).toInt(), queryGraphData.value(1).toInt());
             seriesTemperature->append(i, queryGraphData.value(1).toFloat());
             seriesHumidity->append(i, queryGraphData.value(2).toFloat()*100);
+            seriesPressure->append(i, queryGraphData.value(3).toFloat());
         }
 
         _pChart->legend()->show();
         _pChart->addSeries(seriesTemperature);
         _pChart->addSeries(seriesHumidity);
+        _pChart->addSeries(seriesPressure);
         _pChart->createDefaultAxes();
         _pChart->setTitle("Weather data:");
         _pChartView = new QChartView(_pChart);
@@ -56,7 +59,8 @@ void MainWindow::on_actionRefresh_triggered()
     } else {
         QMessageBox::warning(this, "No connection", "Failed to connect");
     }
-//    delete seriesTemperature;
-//    delete seriesHumidity;
+    delete seriesTemperature;
+    delete seriesHumidity;
+    delete seriesPressure;
 }
 
