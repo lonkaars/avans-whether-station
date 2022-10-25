@@ -7,6 +7,7 @@
 
 #include "esp8266.h"
 #include "setup.h"
+#include "backlog.h"
 
 I2C_HandleTypeDef hi2c1 = {
 	.Instance = I2C1,
@@ -57,7 +58,7 @@ DMA_HandleTypeDef hdma_usart1_rx = {
 	.Init.Priority = DMA_PRIORITY_LOW,
 };
 
-DMA_HandleTypeDef hdma_usart1_tx {
+DMA_HandleTypeDef hdma_usart1_tx = {
 	.Instance = DMA1_Channel2,
 	.Init.Direction = DMA_MEMORY_TO_PERIPH,
 	.Init.PeriphInc = DMA_PINC_DISABLE,
@@ -83,6 +84,14 @@ void ws_io_setup() {
 	ws_io_usart1_setup();
 	ws_io_usart2_setup();
 	ws_io_dma_setup();
+
+	HAL_GPIO_Init(GPIOA, &(GPIO_InitTypeDef) {
+		.Pin = GPIO_PIN_5,
+		.Mode = GPIO_MODE_OUTPUT_PP,
+		.Pull = GPIO_NOPULL
+	});
+
+	ws_backlog_alloc(24 * 60);
 }
 
 static void ws_io_clock_setup() {
@@ -123,7 +132,7 @@ static void ws_io_usart1_setup() {
 	if (HAL_UART_Init(&huart1) != HAL_OK)
 		return ws_setup_error_handler();
 
-	HAL_UARTEx_ReceiveToIdle_DMA(&huart1, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
+	HAL_UART_Receive_DMA(&huart1, (uint8_t*) g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
 }
 

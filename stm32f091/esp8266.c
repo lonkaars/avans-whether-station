@@ -34,7 +34,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 		}
 		// start DMA again
 		// memset(g_ws_esp8266_dma_rx_buffer,'\0',g_ws_esp8266_dma_rx_buffer_Size); // clear rx_buff
-		HAL_UARTEx_ReceiveToIdle_DMA(&huart1, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
+		HAL_UART_Receive_DMA(&huart1, (uint8_t*) g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
 		__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
 	}
 
