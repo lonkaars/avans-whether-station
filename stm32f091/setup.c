@@ -5,6 +5,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#include "esp8266.h"
 #include "setup.h"
 
 I2C_HandleTypeDef hi2c1 = {
@@ -45,10 +46,33 @@ UART_HandleTypeDef huart2 = {
 	.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT,
 };
 
+DMA_HandleTypeDef hdma_usart1_rx = {
+	.Instance = DMA1_Channel1,
+	.Init.Direction = DMA_PERIPH_TO_MEMORY,
+	.Init.PeriphInc = DMA_PINC_DISABLE,
+	.Init.MemInc = DMA_MINC_ENABLE,
+	.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE,
+	.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE,
+	.Init.Mode = DMA_NORMAL,
+	.Init.Priority = DMA_PRIORITY_LOW,
+};
+
+DMA_HandleTypeDef hdma_usart1_tx {
+	.Instance = DMA1_Channel2,
+	.Init.Direction = DMA_MEMORY_TO_PERIPH,
+	.Init.PeriphInc = DMA_PINC_DISABLE,
+	.Init.MemInc = DMA_MINC_ENABLE,
+	.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE,
+	.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE,
+	.Init.Mode = DMA_NORMAL,
+	.Init.Priority = DMA_PRIORITY_LOW,
+};
+
 static void ws_io_clock_setup();
 static void ws_io_i2c_setup();
 static void ws_io_usart1_setup();
 static void ws_io_usart2_setup();
+static void ws_io_dma_setup();
 static void ws_setup_error_handler();
 
 void ws_io_setup() {
@@ -58,6 +82,7 @@ void ws_io_setup() {
 	ws_io_i2c_setup();
 	ws_io_usart1_setup();
 	ws_io_usart2_setup();
+	ws_io_dma_setup();
 }
 
 static void ws_io_clock_setup() {
@@ -97,11 +122,24 @@ static void ws_io_i2c_setup() {
 static void ws_io_usart1_setup() {
 	if (HAL_UART_Init(&huart1) != HAL_OK)
 		return ws_setup_error_handler();
+
+	HAL_UARTEx_ReceiveToIdle_DMA(&huart1, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
+	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
 }
 
 static void ws_io_usart2_setup() {
 	if (HAL_UART_Init(&huart2) != HAL_OK)
 		return ws_setup_error_handler();
+}
+
+static void ws_io_dma_setup() {
+	__HAL_RCC_DMA1_CLK_ENABLE();
+
+	// interrupt priorities
+	HAL_NVIC_SetPriority(DMA1_Ch1_IRQn, 3, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Ch1_IRQn);
+	HAL_NVIC_SetPriority(DMA1_Ch2_3_DMA2_Ch1_2_IRQn, 3, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Ch2_3_DMA2_Ch1_2_IRQn);
 }
 
 void HAL_MspInit() {
@@ -135,6 +173,14 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
     	.Speed = GPIO_SPEED_FREQ_HIGH,
     	.Alternate = GPIO_AF1_USART1,
 		});
+
+    // DMA setup
+    if (HAL_DMA_Init(&hdma_usart1_rx) != HAL_OK) return ws_setup_error_handler();
+    __HAL_DMA1_REMAP(HAL_DMA1_CH1_USART1_RX);
+    __HAL_LINKDMA(huart, hdmarx, hdma_usart1_rx);
+    if (HAL_DMA_Init(&hdma_usart1_tx) != HAL_OK) return ws_setup_error_handler();
+    __HAL_DMA1_REMAP(HAL_DMA1_CH2_USART1_TX);
+    __HAL_LINKDMA(huart, hdmatx, hdma_usart1_tx);
 
     // USART1 interrupt Init
     HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);

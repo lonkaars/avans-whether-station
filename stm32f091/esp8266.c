@@ -2,10 +2,63 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stm32f0xx.h>
 
 #include "esp8266.h"
 #include "setup.h"
 #include "consts.h"
+
+char g_ws_esp8266_dma_rx_buffer[WS_DMA_RX_BUFFER_SIZE];
+char MainBuf[WS_DMA_RX_BUFFER_SIZE]; // TODO: remove
+int isOK = 0; // TODO: remove
+uint16_t g_ws_esp8266_dma_old_pos = 0;
+uint16_t g_ws_esp8266_dma_new_pos = 0;
+
+// when rx receives data handle the message. this function is in stm32. this name needs to stay the same or else it wont work.
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
+	if(huart->Instance == USART1) {
+		g_ws_esp8266_dma_old_pos = g_ws_esp8266_dma_new_pos;   // Update the last position before copying new data
+
+		if(g_ws_esp8266_dma_old_pos+Size > WS_DMA_RX_BUFFER_SIZE) { // if the current position + new data is greater than the main buffer
+			uint16_t dataToCopy = WS_DMA_RX_BUFFER_SIZE-g_ws_esp8266_dma_old_pos; // find remaining space left
+			memcpy ((uint8_t*)MainBuf+g_ws_esp8266_dma_old_pos,g_ws_esp8266_dma_rx_buffer,dataToCopy); // copy data in the remaining space
+
+			g_ws_esp8266_dma_old_pos = 0; // point to the start of the buffer
+			memcpy ((uint8_t*)MainBuf,(uint8_t*)g_ws_esp8266_dma_rx_buffer+dataToCopy,(Size-dataToCopy)); // copy the remaing data
+			g_ws_esp8266_dma_new_pos = (Size-dataToCopy); // update position
+		}
+		// if data is less than new data
+		else {
+			memcpy ((uint8_t*)MainBuf+g_ws_esp8266_dma_old_pos,g_ws_esp8266_dma_rx_buffer,Size);
+			g_ws_esp8266_dma_new_pos = Size+g_ws_esp8266_dma_old_pos;
+		}
+		// start DMA again
+		// memset(g_ws_esp8266_dma_rx_buffer,'\0',g_ws_esp8266_dma_rx_buffer_Size); // clear rx_buff
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart1, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
+		__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+	}
+
+	// check for OK messagge
+	for(int i=0;i<Size;i++){
+		if(g_ws_esp8266_dma_rx_buffer[i]=='O' && g_ws_esp8266_dma_rx_buffer[i+1]=='K'){
+			isOK=1;
+		    //memset(MainBuf,'\0',MainBuf_Size); // clear main buffer if OK is in the main buffer.
+		    //memset(g_ws_esp8266_dma_rx_buffer,'\0',g_ws_esp8266_dma_rx_buffer_Size); // clear rx_buff
+
+		}
+		else if(strncmp(g_ws_esp8266_dma_rx_buffer, "+IPD", 4) == 0){
+
+		}
+	}
+}
+
+void DMA1_Ch1_IRQHandler(void) {
+  HAL_DMA_IRQHandler(&hdma_usart1_rx);
+}
+
+void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) {
+  HAL_DMA_IRQHandler(&hdma_usart1_tx);
+}
 
 void ws_esp8266_ATsendCommand(uint8_t* data){
 	char dataChar[20];
