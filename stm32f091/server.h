@@ -3,11 +3,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-// void ws_server_demo();
-// 
-// /** FreeRTOS task that listens for incoming requests from the esp */
-// void ws_server_listen_task();
-
 /**
  * @brief +IPD incoming request handler
  *
@@ -19,11 +14,4 @@
  * @param size  amount of bytes allowed to be read from `data`
  */
 void ws_server_req_incoming(uint8_t* data, size_t size);
-
-// TODO: server req incoming implementation
-//
-// example +IPD command:
-// +IPD,0,15:last-records 5\n
-//
-// TODO: protocol req response parser
 
