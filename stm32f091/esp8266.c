@@ -16,6 +16,14 @@ void DMA1_Ch1_IRQHandler(void) { HAL_DMA_IRQHandler(&hdma_usart1_rx); }
 void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) { HAL_DMA_IRQHandler(&hdma_usart1_tx); }
 void USART1_IRQHandler(void) { HAL_UART_IRQHandler(&huart1); }
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+
+	HAL_UART_Transmit(&huart2, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE, 100);
+	HAL_UART_Receive_DMA(&huart1, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
+	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+}
+
 void ws_esp8266_send(uint8_t* data, size_t size) {
 	size_t limited_size = WS_MIN(size, WS_DMA_TX_BUFFER_SIZE - 1);
 	memcpy(g_ws_esp8266_dma_tx_buffer, data, limited_size);
