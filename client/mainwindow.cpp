@@ -46,7 +46,7 @@ void MainWindow::drawGraph(){
     if(dbRef.open()){
         QSqlQuery queryGraphData;
 //        queryGraphData.exec("select `tblMain`.`ID`, `temperature`, `humidity`, `pressure` FROM `tblMain` ORDER BY `tblMain`.`ID` DESC limit 16;");
-        queryGraphData.exec("select * FROM `tblMain` ORDER BY `tblMain`.`ID` ASC limit 16;");
+        queryGraphData.exec("select * FROM `tblMain` ORDER BY `tblMain`.`ID` DESC limit 190;");
 
         for (int i = 0; queryGraphData.next(); ++i) {
 //            int time = queryGraphData.value(4).toTime().hour()*100 + queryGraphData.value(4).toTime().minute();
