@@ -22,16 +22,14 @@ I2C_HandleTypeDef hi2c1 = {
 };
 
 UART_HandleTypeDef huart1 = {
-  .Instance = USART1,
-  .Init.BaudRate = 115200,
-  .Init.WordLength = UART_WORDLENGTH_8B,
-  .Init.StopBits = UART_STOPBITS_1,
-  .Init.Parity = UART_PARITY_NONE,
-  .Init.Mode = UART_MODE_TX_RX,
-  .Init.HwFlowCtl = UART_HWCONTROL_NONE,
-  .Init.OverSampling = UART_OVERSAMPLING_16,
-//   .Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE,
-//   .AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT,
+	.Instance = USART1,
+	.Init.BaudRate = 115200,
+	.Init.WordLength = UART_WORDLENGTH_8B,
+	.Init.StopBits = UART_STOPBITS_1,
+	.Init.Parity = UART_PARITY_NONE,
+	.Init.Mode = UART_MODE_TX_RX,
+	.Init.HwFlowCtl = UART_HWCONTROL_NONE,
+	.Init.OverSampling = UART_OVERSAMPLING_16,
 };
 
 UART_HandleTypeDef huart2 = {
@@ -133,11 +131,8 @@ static void ws_io_usart1_setup() {
 	if (HAL_UART_Init(&huart1) != HAL_OK)
 		return ws_setup_error_handler();
 
-	// HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RX_DMA_buffer, RX_DMA_BUFFER_SIZE);
 	HAL_UART_Receive_DMA(&huart1, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
-	// __HAL_DMA_ENABLE_IT(&hdma_usart1_rx, DMA_IT_TC);
-	// __HAL_UART_ENABLE_IT(&huart1, UART_IT_TC);
 }
 
 static void ws_io_usart2_setup() {
@@ -196,7 +191,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
     __HAL_LINKDMA(huart, hdmatx, hdma_usart1_tx);
 
     // USART1 interrupt Init
-    HAL_NVIC_SetPriority(USART1_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
 	} else if (huart->Instance == USART2) {
 		__HAL_RCC_USART2_CLK_ENABLE();
