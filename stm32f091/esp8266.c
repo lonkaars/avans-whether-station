@@ -7,6 +7,7 @@
 #include "esp8266.h"
 #include "setup.h"
 #include "consts.h"
+#include "server.h"
 #include "util.h"
 
 uint8_t g_ws_esp8266_dma_rx_buffer[WS_DMA_RX_BUFFER_SIZE];
@@ -17,9 +18,8 @@ void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) { HAL_DMA_IRQHandler(&hdma_usart1_tx
 void USART1_IRQHandler(void) { HAL_UART_IRQHandler(&huart1); }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
-	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+	ws_server_req_incoming(g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
 
-	HAL_UART_Transmit(&huart2, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE, 100);
 	HAL_UART_Receive_DMA(&huart1, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
 }
