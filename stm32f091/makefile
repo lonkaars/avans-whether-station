@@ -90,6 +90,7 @@ $(TARGET).elf: $(OBJS)
 
 flash: $(TARGET).bin
 	st-flash write $(TARGET).bin 0x08000000
+	st-flash reset
 
 compile_commands: clean
 	compiledb make -n

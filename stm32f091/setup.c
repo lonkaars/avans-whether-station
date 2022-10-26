@@ -132,7 +132,6 @@ static void ws_io_usart1_setup() {
 	if (HAL_UART_Init(&huart1) != HAL_OK)
 		return ws_setup_error_handler();
 
-	HAL_UART_Receive_DMA(&huart1, (uint8_t*) g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
 }
 

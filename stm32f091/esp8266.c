@@ -14,6 +14,7 @@ int isOK = 0; // TODO: remove
 uint16_t g_ws_esp8266_dma_old_pos = 0;
 uint16_t g_ws_esp8266_dma_new_pos = 0;
 
+/*
 // when rx receives data handle the message. this function is in stm32. this name needs to stay the same or else it wont work.
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 	if(huart->Instance == USART1) {
@@ -51,14 +52,11 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 		}
 	}
 }
+*/
 
-void DMA1_Ch1_IRQHandler(void) {
-  HAL_DMA_IRQHandler(&hdma_usart1_rx);
-}
-
-void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) {
-  HAL_DMA_IRQHandler(&hdma_usart1_tx);
-}
+void DMA1_Ch1_IRQHandler(void) { HAL_DMA_IRQHandler(&hdma_usart1_rx); }
+void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) { HAL_DMA_IRQHandler(&hdma_usart1_tx); }
+void USART1_IRQHandler(void) { HAL_UART_IRQHandler(&huart1); }
 
 void ws_esp8266_ATsendCommand(uint8_t* data){
 	char dataChar[20];
