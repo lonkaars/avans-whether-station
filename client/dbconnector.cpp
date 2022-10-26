@@ -2,7 +2,7 @@
 #include "ui_dbconnector.h"
 #include "main.h"
 
-//#include "mainwindow.h"
+#include "mainwindow.h"
 
 dbConnector::dbConnector(QWidget *parent) :
     QDialog(parent),

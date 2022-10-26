@@ -27,14 +27,18 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void on_actionAbout_triggered();
+    virtual void drawGraph();
 
-    void on_pushButton_clicked();
+private slots:
+//    void on_actionAbout_triggered();
+
+//    void on_pushButton_clicked();
 
     void on_actionConnection_triggered();
 
     void on_actionRefresh_triggered();
+
+    void on_actionDisconnenct_triggered();
 
 private:
     Ui::MainWindow *ui;

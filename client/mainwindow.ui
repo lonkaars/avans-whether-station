@@ -41,7 +41,6 @@
     <property name="title">
      <string>Home</string>
     </property>
-    <addaction name="actionAbout"/>
     <addaction name="actionRefresh"/>
    </widget>
    <widget class="QMenu" name="menuDatabase">
@@ -50,17 +49,11 @@
     </property>
     <addaction name="actionConnection"/>
     <addaction name="actionDisconnenct"/>
-    <addaction name="actionStatus"/>
    </widget>
    <addaction name="menuAbouy"/>
    <addaction name="menuDatabase"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
   <action name="actionRefresh">
    <property name="text">
     <string>Refresh</string>
@@ -83,20 +76,13 @@
    <property name="text">
     <string>Connect</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionDisconnenct">
    <property name="text">
     <string>Disconnenct</string>
-   </property>
-  </action>
-  <action name="actionQuerry_2">
-   <property name="text">
-    <string>Querry</string>
-   </property>
-  </action>
-  <action name="actionStatus">
-   <property name="text">
-    <string>Status</string>
    </property>
   </action>
  </widget>
