@@ -16,7 +16,7 @@ static ws_s_server_parser g_ws_server_parser = {
 	.current_channel = 0,
 	.channel_data_length = 0,
 	.channel_data_counter = 0,
-	.channel_listen_mode = WS_SERVER_CL_DATA_LENGTH,
+	.channel_listen_mode = WS_SERVER_CL_CHANNEL_ID,
 };
 
 static ws_s_protocol_req_parser_state* g_ws_protocol_parsers[WS_SERVER_MAX_CHANNELS] = {0};
@@ -101,8 +101,8 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 									g_ws_server_parser.channel_data_ignore = true;
 								break;
 							}
-							g_ws_server_parser.current_channel *= 10;
-							g_ws_server_parser.current_channel += byte - '0'; // ascii to int
+							g_ws_server_parser.channel_data_length *= 10;
+							g_ws_server_parser.channel_data_length += byte - '0'; // ascii to int
 							break;
 						}
 						case WS_SERVER_CL_DATA_READ: {

@@ -90,7 +90,9 @@ void ws_io_setup() {
 		.Pull = GPIO_NOPULL
 	});
 
+	// TODO: remove debug size
 	ws_backlog_alloc(24 * 60);
+	// ws_backlog_alloc(10);
 
 #ifdef WS_ESP8266_WLAN_MAC
 	ws_esp8266_set_mac();

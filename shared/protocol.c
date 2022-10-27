@@ -99,7 +99,10 @@ ws_s_protocol_req_parser_state* ws_protocol_req_parser_alloc() {
 void ws_protocol_req_cmd_init(ws_s_protocol_req_parser_state* state) {
 	state->target = malloc(sizeof(ws_s_protocol_parsed_req_cmd) + sizeof(char*) * state->arg_len);
 	for (unsigned int i = 0; i < state->arg_len; i++)
-		state->target->argv[i] = malloc(sizeof(char) * (state->args_len[i] + 1));
+		state->target->argv[i] = malloc(sizeof(char) * (state->args_len[i] + 1)); // segfaults on 2nd run?
+	// state->target->argv stays empty according to debugger
+	// goes to HardFault_Handler on 2nd iteration
+	// this might be the stm running out of heap memory though i'm not sure
 
 	state->target->argc = state->arg_len;
 
