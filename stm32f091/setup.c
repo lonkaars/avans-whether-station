@@ -91,6 +91,16 @@ void ws_io_setup() {
 	});
 
 	ws_backlog_alloc(24 * 60);
+
+#ifdef WS_ESP8266_WLAN_MAC
+	ws_esp8266_set_mac();
+#endif
+#ifdef WS_ESP8266_WLAN_IP
+	ws_esp8266_set_ip();
+#endif
+	ws_esp8266_ap_client_mode();
+	ws_esp8266_connect();
+	ws_esp8266_start_tcp_server();
 }
 
 static void ws_io_clock_setup() {

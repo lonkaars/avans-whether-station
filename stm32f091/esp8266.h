@@ -25,18 +25,17 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart);
 /** @brief send data to esp over uart with dma */
 void ws_esp8266_send(uint8_t* data, size_t size);
 
+/** @brief start dma receive and reset half-transfer interrupt flag */
 void ws_esp8266_start_receive();
 
-// TODO: remove/update/document/refactor these functions
-void ws_esp8266_ATsendCommand(uint8_t* data);
-int ws_esp8266_checkOK(uint8_t *receiveData,int length);
-int ws_esp8266_receivingMsg(uint8_t *receiveData,int length);
-int ws_esp8266_unlink(uint8_t *receiveData,int length);
-void ws_esp8266_StartEsp();
-void ws_esp8266_disconnect();
-void ws_esp8266_mode();
+/** @brief connect to access point using wifi.h credentials */
 void ws_esp8266_connect();
-void ws_esp8266_serveraan();
-void ws_esp8266_serveruit();
-void ws_esp8266_mux();
-void ws_esp8266_close();
+/** @brief set esp to access point client mode (connect to AP, not become one) */
+void ws_esp8266_ap_client_mode();
+/** @brief initialize and configure the tcp server */
+void ws_esp8266_start_tcp_server();
+
+/** @brief set mac address of the esp client */
+void ws_esp8266_set_mac();
+/** @brief set static ip address of the esp client */
+void ws_esp8266_set_ip();

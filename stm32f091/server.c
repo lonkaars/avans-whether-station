@@ -77,8 +77,8 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 				break;
 			}
 			case WS_SERVER_LM_IDLE: {
-				if (next_few_bytes_are("+IPD")) {
-					i += 3; // skip I, P, and D
+				if (next_few_bytes_are("+IPD,")) {
+					i += 4; // skip I, P, D, and comma
 					g_ws_server_parser.mode = WS_SERVER_LM_IPD_LISTENING;
 				}
 				break;
