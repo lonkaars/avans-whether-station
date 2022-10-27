@@ -8,6 +8,10 @@
 #include <QMessageBox>
 #include <QtSql>
 #include <QSqlDatabase>
+#include <QtCharts>
+#include <QWidget>
+#include <QWidgetSet>
+
 #include "main.h"
 
 
@@ -23,20 +27,26 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void on_actionAbout_triggered();
+    virtual void drawGraph();
 
-    void on_pushButton_clicked();
+private slots:
+//    void on_actionAbout_triggered();
+
+//    void on_pushButton_clicked();
 
     void on_actionConnection_triggered();
+
+    void on_actionRefresh_triggered();
+
+    void on_actionDisconnenct_triggered();
 
 private:
     Ui::MainWindow *ui;
 
     dbConnector *_dbConenctor;
-//    QSqlDatabase db;
 
-    QSqlQueryModel *pQueryModel;
+    QChart *_pChart;
+//    QLineSeries *_pSeries;
+    QChartView *_pChartView;
 
-//    Database database;
 };

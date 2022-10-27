@@ -4,11 +4,12 @@
 #include "ui_mainwindow.h"
 #include "main.h"
 
+#include <QDebug>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-//    db = QSqlDatabase::addDatabase("QMYSQL");
     ui->setupUi(this);
 }
 
@@ -18,33 +19,98 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actionAbout_triggered()
-{
-    QMessageBox::warning(this, "Oops..", "Task Failed succesfully ;)");
-}
-
-
-void MainWindow::on_pushButton_clicked()
-{
-//    dbRef = QSqlDatabase::addDatabase("QMYSQL");
-//    dbRef.setHostName("localhost");
-//    dbRef.setUserName("root");
-//    dbRef.setPassword("Ab12345!");
-//    dbRef.setDatabaseName("thecrapbox");
-
-    if(dbRef.open()){
-        QMessageBox::information(this, "Connection", "GREAT SUCCES!");
-        pQueryModel = new QSqlQueryModel();
-        pQueryModel->setQuery("SELECT * FROM opleiding;");
-        ui->tableView->setModel(pQueryModel);
-    } else {
-        QMessageBox::warning(this, "No connection", "Failed to connect");
-    }
-}
-
 void MainWindow::on_actionConnection_triggered()
 {
     _dbConenctor = new dbConnector(this);
     _dbConenctor->show();
+}
+
+void MainWindow::on_actionRefresh_triggered()
+{
+    drawGraph();
+}
+
+void MainWindow::on_actionDisconnenct_triggered()
+{
+    dbRef.close();
+}
+
+
+void MainWindow::drawGraph(){
+    QLineSeries *seriesTemperature = new QLineSeries();
+    QLineSeries *seriesHumidity = new QLineSeries();
+    QLineSeries *seriesPressure = new QLineSeries();
+
+
+
+    if(dbRef.open()){
+        QSqlQuery queryGraphData;
+//        queryGraphData.exec("select `tblMain`.`ID`, `temperature`, `humidity`, `pressure` FROM `tblMain` ORDER BY `tblMain`.`ID` DESC limit 16;");
+        queryGraphData.exec("select * FROM `tblMain` ORDER BY `tblMain`.`ID` DESC limit 190;");
+
+        for (int i = 0; queryGraphData.next(); ++i) {
+//            int time = queryGraphData.value(4).toTime().hour()*100 + queryGraphData.value(4).toTime().minute();
+            int time = i;
+//            seriesPressure->append(queryGraphData.value(0).toInt(), queryGraphData.value(1).toFloat());
+//            seriesTemperature->append(i, queryGraphData.value(1).toInt());
+//            seriesHumidity->append(i, queryGraphData.value(2).toFloat());
+//            seriesPressure->append(i, queryGraphData.value(3).toInt());
+
+            seriesTemperature->append(time, queryGraphData.value(1).toFloat());
+            seriesHumidity->append(time, queryGraphData.value(2).toFloat());
+            seriesPressure->append(time, (queryGraphData.value(3).toFloat()*100));
+
+//            qDebug() << time;
+        }
+
+//        QPen pen(QRgb(0x57FF00));
+//        pen.setWidth(5);
+//        seriesHumidity->setPen(pen);
+
+
+        QChart *chartTemperature = new QChart();
+        chartTemperature->legend()->hide();
+        chartTemperature->addSeries(seriesTemperature);
+        chartTemperature->createDefaultAxes();
+        chartTemperature->setTitle("Temperature!");
+        QChartView *chartView1 = new QChartView(chartTemperature);
+
+        QChart *chartHumidity = new QChart();
+        chartHumidity->legend()->hide();
+        chartHumidity->addSeries(seriesHumidity);
+        chartHumidity->createDefaultAxes();
+        chartHumidity->setTitle("Humidity!");
+        QChartView *chartView2 = new QChartView(chartHumidity);
+
+        QChart *chartPressure = new QChart();
+        chartPressure->legend()->hide();
+        chartPressure->addSeries(seriesPressure);
+        chartPressure->createDefaultAxes();
+        chartPressure->setTitle("Pressure!");
+        QChartView *chartView3 = new QChartView(chartPressure);
+
+
+        QWidget *window = new QWidget;
+        QGridLayout *layout = new QGridLayout(window);
+        layout->addWidget(chartView1, 0 ,0);
+        layout->addWidget(chartView2, 1 ,0);
+        layout->addWidget(chartView3, 2 ,0);
+
+        layout->setVerticalSpacing(0);
+        layout->setHorizontalSpacing(0);
+        layout->setContentsMargins(0,0,0,0);
+
+
+
+//        window->show();
+
+        MainWindow::setCentralWidget(window);
+
+    } else {
+        QMessageBox::warning(this, "No connection", "Failed to connect");
+    }
+//    delete seriesTemperature;
+//    delete seriesHumidity;
+//    delete seriesPressure;
 }
 

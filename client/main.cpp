@@ -9,8 +9,8 @@
 #include <iostream>
 #include <stdio.h>
 
-#include "chart.h"
-#include "chartview.h"
+//#include "chart.h"
+//#include "chartview.h"
 #include "mainwindow.h"
 #include "main.h"
 #include "ui_mainwindow.h"
@@ -25,8 +25,9 @@ int main(int argc, char *argv[])
 	TimeTest time;
 	MyTcpSocket s;
 	// s.doConnect();
-	MainWindow w;
-	dbRef = QSqlDatabase::addDatabase("QMYSQL");
+    MainWindow w;
+
+    dbRef = QSqlDatabase::addDatabase("QMYSQL");
 
 	w.show();
 	return a.exec();
