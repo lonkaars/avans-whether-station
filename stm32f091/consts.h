@@ -3,6 +3,7 @@
 #include "wifi.h"
 
 #define WS_SERVER_PORT "80"
+#define WS_SERVER_MAX_CHANNELS 2
 
 #define WS_DMA_RX_BUFFER_SIZE 100
 #define WS_DMA_TX_BUFFER_SIZE 100

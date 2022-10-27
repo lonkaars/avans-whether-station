@@ -12,6 +12,12 @@ typedef enum {
 } ws_e_server_listen_mode;
 
 typedef enum {
+	WS_SERVER_CL_CHANNEL_ID, /** @brief listen channel id */
+	WS_SERVER_CL_DATA_LENGTH, /** @brief listen for data byte length */
+	WS_SERVER_CL_DATA_READ, /** @brief listen for data and pipe to ws_protocol_parse_req_byte */
+} ws_e_channel_listen_mode;
+
+typedef enum {
 	WS_SERVER_RC_NONE = -1,
 	WS_SERVER_RC_BUSY,
 	WS_SERVER_RC_ERR,
@@ -19,9 +25,13 @@ typedef enum {
 } ws_e_server_response_code;
 
 typedef struct {
-	int counter;
 	ws_e_server_listen_mode mode;
 	ws_e_server_response_code last_response;
+	unsigned int current_channel;
+	unsigned int channel_data_length;
+	unsigned int channel_data_counter;
+	ws_e_channel_listen_mode channel_listen_mode;
+	bool channel_data_ignore;
 } ws_s_server_parser;
 
 /**
@@ -42,3 +52,25 @@ void ws_server_req_respond(unsigned int channel, uint8_t* data, size_t size);
 /** @brief send data to esp, waiting until server returns to idle mode */
 void ws_server_send(uint8_t* data, size_t size);
 
+/**
+ * @brief parse byte from channel
+ *
+ * automatically creates parser struct and passes data onto protocol parser
+ * functions
+ *
+ * @param channel  request channel
+ * @param byte  data byte
+ * @param ignore  ignore mode
+ */
+void ws_server_req_parse_byte(unsigned int channel, uint8_t byte, bool ignore);
+
+/**
+ * @brief close connection
+ *
+ * deallocates any parser struct that were automatically created in
+ * ws_server_req_parse_byte
+ *
+ * @param channel  request channel
+ * @param ignore  ignore mode
+ */
+void ws_server_req_finish(unsigned int channel, bool ignore);

@@ -6,7 +6,6 @@
 #include "setup.h"
 
 void ws_test_write_task() {
-	// uint8_t data[] = "AT+CIPMUX=1+CWMODE=1+CWJAP=\"" WS_ESP8266_WLAN_SSID "\",\"" WS_ESP8266_WLAN_PASSWD "\"\r\n";
 	uint8_t cmd1[] = "AT+CIPMUX=1\r\n";
 	uint8_t cmd2[] = "AT+CWMODE=1\r\n";
 	uint8_t cmd3[] = "AT+CWJAP=\"" WS_ESP8266_WLAN_SSID "\",\"" WS_ESP8266_WLAN_PASSWD "\"\r\n";
