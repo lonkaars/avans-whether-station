@@ -133,12 +133,15 @@ static void ws_io_usart1_setup() {
 
 	HAL_UART_Receive_DMA(&huart1, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
 	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+
+	__HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE); // enable receive intterupts
+	__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE); // enable idle line detection
 }
 
 static void ws_io_usart2_setup() {
 	if (HAL_UART_Init(&huart2) != HAL_OK)
 		return ws_setup_error_handler();
-}
+} 
 
 static void ws_io_dma_setup() {
 	__HAL_RCC_DMA1_CLK_ENABLE();

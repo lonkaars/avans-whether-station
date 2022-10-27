@@ -3,6 +3,7 @@
 #include <stm32f0xx_hal.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "consts.h"
 
@@ -21,11 +22,10 @@ void USART1_IRQHandler(void);
 /** @brief receive chunk complete */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart);
 
-/** @brief send response to incoming request on specific channel */
-void ws_esp8266_res_send(unsigned int channel, uint8_t* data, size_t size);
-
 /** @brief send data to esp over uart with dma */
 void ws_esp8266_send(uint8_t* data, size_t size);
+
+void ws_esp8266_start_receive();
 
 // TODO: remove/update/document/refactor these functions
 void ws_esp8266_ATsendCommand(uint8_t* data);

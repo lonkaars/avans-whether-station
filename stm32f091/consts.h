@@ -4,8 +4,8 @@
 
 #define WS_SERVER_PORT "80"
 
-#define WS_DMA_RX_BUFFER_SIZE 10
-#define WS_DMA_TX_BUFFER_SIZE 50
+#define WS_DMA_RX_BUFFER_SIZE 100
+#define WS_DMA_TX_BUFFER_SIZE 100
 
 #define WS_PINOUT_I2C_SDA_PIN GPIO_PIN_9
 #define WS_PINOUT_I2C_SDA_PORT GPIOB
@@ -22,3 +22,5 @@
 #define WS_PINOUT_USART2_TX_PIN GPIO_PIN_2
 #define WS_PINOUT_USART2_TX_PORT GPIOA
 
+// print esp communication over usb serial (green for tx, red for rx)
+#define WS_DBG_PRINT_ESP_OVER_USART2
