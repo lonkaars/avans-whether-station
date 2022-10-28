@@ -46,7 +46,7 @@ void ws_server_req_finish(unsigned int channel, bool ignore) {
 
 // TODO: next_few_bytes_are assumes that the complete search string is in the
 // buffer, so won't work for buffer cutoffs
-#define next_few_bytes_are(code) (i + sizeof(code) - 1 < size && strncmp((char*)&data[i], code, sizeof(code) - 1) == 0)
+#define next_few_bytes_are(code) (((i + sizeof(code) - 2) < size) && (strncmp((char*)&data[i], code, sizeof(code) - 1) == 0))
 void ws_server_req_incoming(uint8_t* data, size_t size) {
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
 	ws_dbg_set_usart2_tty_color(1);
@@ -80,7 +80,7 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 				if (next_few_bytes_are("+IPD,")) {
 					i += 4; // skip I, P, D, and comma
 					g_ws_server_parser.mode = WS_SERVER_LM_IPD_LISTENING;
-				} else if (byte == '>') {
+				} else if (next_few_bytes_are("> ")) {
 					g_ws_server_parser.mode = WS_SERVER_LM_CIPSEND_LISTENING;
 					ws_server_buffer_send_finish();
 				}
