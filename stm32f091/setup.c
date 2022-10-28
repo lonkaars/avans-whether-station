@@ -9,6 +9,7 @@
 #include "setup.h"
 #include "backlog.h"
 #include "server.h"
+#include "util.h"
 
 I2C_HandleTypeDef hi2c1 = {
 	.Instance = I2C1,
@@ -94,6 +95,12 @@ void ws_io_setup() {
 	// TODO: remove debug size
 	ws_backlog_alloc(24 * 60);
 	// ws_backlog_alloc(10);
+
+#ifdef WS_DBG_PRINT_ESP_OVER_USART2
+	ws_dbg_set_usart2_tty_color(7);
+	const char restart_str[] = "\r\n--- stm restart ---\r\n";
+	HAL_UART_Transmit(&huart2, restart_str, strlen(restart_str), 100);
+#endif
 
 #ifdef WS_ESP8266_WLAN_MAC
 	ws_esp8266_set_mac();

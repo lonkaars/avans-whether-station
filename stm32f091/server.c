@@ -8,6 +8,7 @@
 #include "server.h"
 #include "setup.h"
 #include "consts.h"
+#include "util.h"
 
 ws_s_server_parser g_ws_server_parser = {
 	.last_response = WS_SERVER_RC_NONE,
@@ -48,8 +49,7 @@ void ws_server_req_finish(unsigned int channel, bool ignore) {
 #define next_few_bytes_are(code) (i + sizeof(code) - 1 < size && strncmp((char*)&data[i], code, sizeof(code) - 1) == 0)
 void ws_server_req_incoming(uint8_t* data, size_t size) {
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
-	uint8_t red[] = { 0x1b, 0x5b, 0x33, 0x31, 0x6d };
-	HAL_UART_Transmit(&huart2, red, sizeof(red), 100);
+	ws_dbg_set_usart2_tty_color(1);
 	HAL_UART_Transmit(&huart2, data, size, 100);
 #endif
 
@@ -128,7 +128,6 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 			case WS_SERVER_LM_CIPSEND_LISTENING: {
 				if (next_few_bytes_are("SEND OK") || next_few_bytes_are("ERROR")) {
 					ws_server_req_respond_end(0);
-					// g_ws_server_parser.mode = WS_SERVER_LM_IDLE;
 				}
 				break;
 			}
@@ -153,8 +152,7 @@ void ws_server_buffer_send_append(uint8_t* data, size_t size) {
 // TODO: refactor this
 void ws_server_buffer_send_finish() {
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
-	uint8_t green[] = { 0x1b, 0x5b, 0x33, 0x32, 0x6d };
-	HAL_UART_Transmit(&huart2, green, sizeof(green), 100);
+	ws_dbg_set_usart2_tty_color(2);
 	HAL_UART_Transmit(&huart2, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_size, 100);
 #endif
 

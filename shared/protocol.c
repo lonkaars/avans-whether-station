@@ -142,6 +142,6 @@ unsigned short ws_protocol_get_header_size(ws_s_protocol_res* response) {
 	unsigned short size = 2; // comma and trailing newline
 	if (response->success == WS_PROTOCOL_CMD_RETURN_OK) size += 2; // ok
 	if (response->success == WS_PROTOCOL_CMD_RETURN_ERROR) size += 5; // error
-	size += ws_log16(response->msg->bytes); // amount of characters for message size (hex)
+	size += ws_log16(response->msg->bytes) + 1; // amount of characters for message size (hex)
 	return size;
 }
