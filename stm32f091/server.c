@@ -127,9 +127,8 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 			}
 			case WS_SERVER_LM_CIPSEND_LISTENING: {
 				if (next_few_bytes_are("SEND OK")) {
-					i += 6;
-					// g_ws_server_parser.mode = WS_SERVER_LM_IDLE;
 					ws_server_req_respond_end(0);
+					// g_ws_server_parser.mode = WS_SERVER_LM_IDLE;
 				}
 				break;
 			}

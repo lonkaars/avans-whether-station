@@ -17,6 +17,8 @@
 }
 
 uint8_t g_ws_esp8266_dma_rx_buffer[WS_DMA_RX_BUFFER_SIZE];
+unsigned int g_ws_esp8266_dma_rx_head = 0;
+unsigned int g_ws_esp8266_dma_rx_tail = 0;
 uint8_t g_ws_esp8266_dma_tx_buffer[WS_DMA_TX_BUFFER_SIZE];
 
 void DMA1_Ch1_IRQHandler(void) { HAL_DMA_IRQHandler(&hdma_usart1_rx); }
@@ -24,19 +26,30 @@ void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) { HAL_DMA_IRQHandler(&hdma_usart1_tx
 void USART1_IRQHandler(void) {
 	if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE)) {
 		__HAL_UART_CLEAR_IDLEFLAG(&huart1);
-		HAL_UART_RxCpltCallback(&huart1);
-		HAL_UART_DMAStop(&huart1);
-		ws_esp8266_start_receive();
+		// https://stackoverflow.com/questions/71039052/hal-uartex-rxeventcallback-circular-dma-what-address-is-the-data
+		g_ws_esp8266_dma_rx_head = huart1.RxXferSize - huart1.hdmarx->Instance->CNDTR;
+
+		ws_esp8266_incoming_data_chunk();
 	}
 	HAL_UART_IRQHandler(&huart1);
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
-	size_t len = strlen((char*) g_ws_esp8266_dma_rx_buffer);
-	if (len > 0) ws_server_req_incoming(g_ws_esp8266_dma_rx_buffer, len);
-
-	memset(g_ws_esp8266_dma_rx_buffer, 0, WS_DMA_RX_BUFFER_SIZE);
-	ws_esp8266_start_receive();
+void ws_esp8266_incoming_data_chunk() {
+	if (g_ws_esp8266_dma_rx_head == g_ws_esp8266_dma_rx_tail) return; // no new data
+	if (g_ws_esp8266_dma_rx_head > g_ws_esp8266_dma_rx_tail) {
+		// read from tail until head
+		ws_server_req_incoming(&g_ws_esp8266_dma_rx_buffer[g_ws_esp8266_dma_rx_tail],
+			g_ws_esp8266_dma_rx_head - g_ws_esp8266_dma_rx_tail);
+	} else /* if (g_ws_esp8266_dma_rx_head < g_ws_esp8266_dma_rx_tail) */ {
+		// read from tail until end of buffer
+		ws_server_req_incoming(&g_ws_esp8266_dma_rx_buffer[g_ws_esp8266_dma_rx_tail],
+			WS_DMA_RX_BUFFER_SIZE - g_ws_esp8266_dma_rx_tail);
+		// read from buffer begin until head
+		ws_server_req_incoming(&g_ws_esp8266_dma_rx_buffer[0], // yes i know this looks dumb
+			g_ws_esp8266_dma_rx_head);
+	}
+	// finish read by shifting tail forward
+	g_ws_esp8266_dma_rx_tail = g_ws_esp8266_dma_rx_head;
 }
 
 void ws_esp8266_send(uint8_t* data, size_t size) {
@@ -52,11 +65,6 @@ void ws_esp8266_send(uint8_t* data, size_t size) {
 
 	HAL_UART_Transmit_DMA(&huart1, g_ws_esp8266_dma_tx_buffer, strlen((char*) g_ws_esp8266_dma_tx_buffer));
 	__HAL_UART_ENABLE_IT(&huart1, UART_IT_TXE);
-}
-
-void ws_esp8266_start_receive() {
-	HAL_UART_Receive_DMA(&huart1, g_ws_esp8266_dma_rx_buffer, WS_DMA_RX_BUFFER_SIZE);
-	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
 }
 
 void ws_esp8266_connect() {

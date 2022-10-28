@@ -53,7 +53,7 @@ DMA_HandleTypeDef hdma_usart1_rx = {
 	.Init.MemInc = DMA_MINC_ENABLE,
 	.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE,
 	.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE,
-	.Init.Mode = DMA_NORMAL,
+	.Init.Mode = DMA_CIRCULAR,
 	.Init.Priority = DMA_PRIORITY_LOW,
 };
 

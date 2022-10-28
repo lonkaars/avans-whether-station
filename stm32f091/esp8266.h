@@ -19,14 +19,11 @@ void DMA1_Ch1_IRQHandler(void);
 /** @brief USART1 interrupt handler */
 void USART1_IRQHandler(void);
 
-/** @brief receive chunk complete */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart);
-
 /** @brief send data to esp over uart with dma */
 void ws_esp8266_send(uint8_t* data, size_t size);
 
-/** @brief start dma receive and reset half-transfer interrupt flag */
-void ws_esp8266_start_receive();
+/** @brief line idle, handle new data on dma buffer */
+void ws_esp8266_incoming_data_chunk();
 
 /** @brief connect to access point using wifi.h credentials */
 void ws_esp8266_connect();
