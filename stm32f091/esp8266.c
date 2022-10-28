@@ -80,30 +80,3 @@ void ws_esp8266_set_mac() {
 void ws_esp8266_set_ip() {
 	ws_esp8266_send_seq("AT+CIPSTA=\"" WS_ESP8266_WLAN_IP "\"\r\n");
 }
-
-// TODO: refactor code from here to EOF
-void ws_esp8266_ATsendCommand(uint8_t* data){
-	char dataChar[20];
-	uint8_t Tx_send[]="AT+CIPSEND=0,";
-
-	itoa(strlen((char*)data),dataChar,10);
-	strcat((char*)Tx_send,dataChar);
-	strcat((char*)Tx_send,"\r\n");
-	HAL_UART_Transmit(&huart1, Tx_send, strlen((char*)Tx_send),1000);
-	HAL_Delay(2000);
-	HAL_UART_Transmit(&huart1, data, strlen((char*)data),1000);
-	HAL_Delay(1000);
-	HAL_UART_Transmit(&huart2, data, strlen((char*)data),1000);
-	HAL_Delay(5000);
-}
-void ws_esp8266_close(){
-
-	uint8_t Tx_close[]="AT+CIPCLOSE=0\r\n";
-
-
-	    HAL_UART_Transmit(&huart1, Tx_close,strlen((char*)Tx_close), 100);
-
-		HAL_Delay(3000);
-
-}
-

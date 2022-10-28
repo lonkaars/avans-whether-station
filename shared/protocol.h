@@ -5,7 +5,7 @@
 
 #include "bin.h"
 
-#define WS_PROTOCOL_CMD_MAX_ARGUMENTS (1)
+#define WS_PROTOCOL_CMD_MAX_ARGUMENTS (2)
 #define WS_PROTOCOL_CMD_BUFFER_LEN (40)
 
 #define WS_PROTOCOL_CMD_AMOUNT (1)
@@ -148,3 +148,4 @@ static ws_protocol_res_handler_t* g_ws_protocol_res_handlers[WS_PROTOCOL_CMD_AMO
 	[WS_PROTOCOL_CMD_LAST_RECORDS] = &ws_protocol_res_last_records,
 };
 
+unsigned short ws_protocol_get_header_size(ws_s_protocol_res* response);

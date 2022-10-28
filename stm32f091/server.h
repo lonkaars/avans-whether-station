@@ -9,6 +9,7 @@ typedef enum {
 	WS_SERVER_LM_STATUS_CODE, /** @brief listen for busy, ERROR or OK */
 	WS_SERVER_LM_IDLE, /** @brief listen for incoming +IPD commands */
 	WS_SERVER_LM_IPD_LISTENING, /** @brief +IPD received, now reading data */
+	WS_SERVER_LM_CIPSEND_LISTENING, /** @brief AT+CIPSEND sent, now reading data */
 } ws_e_server_listen_mode;
 
 typedef enum {
@@ -34,6 +35,9 @@ typedef struct {
 	bool channel_data_ignore;
 } ws_s_server_parser;
 
+/** @brief global server parser struct */
+extern ws_s_server_parser g_ws_server_parser;
+
 /**
  * @brief +IPD incoming request handler
  *
@@ -46,8 +50,10 @@ typedef struct {
  */
 void ws_server_req_incoming(uint8_t* data, size_t size);
 
-/** @brief send response to incoming request on specific channel */
-void ws_server_req_respond(unsigned int channel, uint8_t* data, size_t size);
+/** @brief send AT response header for incoming request on specific channel */
+void ws_server_req_respond_start(unsigned int channel, size_t size);
+/** @brief send AT tcp close on specific channel */
+void ws_server_req_respond_end(unsigned int channel);
 
 /** @brief send data to esp, waiting until server returns to idle mode */
 void ws_server_send(uint8_t* data, size_t size);
@@ -74,3 +80,6 @@ void ws_server_req_parse_byte(unsigned int channel, uint8_t byte, bool ignore);
  * @param ignore  ignore mode
  */
 void ws_server_req_finish(unsigned int channel, bool ignore);
+
+void ws_server_buffer_send_append(uint8_t* data, size_t size);
+void ws_server_buffer_send_finish();

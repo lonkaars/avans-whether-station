@@ -8,6 +8,7 @@
 #include "esp8266.h"
 #include "setup.h"
 #include "backlog.h"
+#include "server.h"
 
 I2C_HandleTypeDef hi2c1 = {
 	.Instance = I2C1,
@@ -101,7 +102,7 @@ void ws_io_setup() {
 	ws_esp8266_set_ip();
 #endif
 	ws_esp8266_ap_client_mode();
-	ws_esp8266_connect();
+	do ws_esp8266_connect(); while (g_ws_server_parser.last_response == WS_SERVER_RC_ERR);
 	ws_esp8266_start_tcp_server();
 }
 
