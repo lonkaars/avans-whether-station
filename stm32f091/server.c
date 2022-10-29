@@ -49,7 +49,7 @@ void ws_server_req_finish(unsigned int channel, bool ignore) {
 #define next_few_bytes_are(code) (((i + sizeof(code) - 2) < size) && (strncmp((char*)&data[i], code, sizeof(code) - 1) == 0))
 void ws_server_req_incoming(uint8_t* data, size_t size) {
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
-	ws_dbg_set_usart2_tty_color(1);
+	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_RX);
 	HAL_UART_Transmit(&huart2, data, size, 100);
 #endif
 
@@ -64,12 +64,19 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 			case WS_SERVER_LM_STATUS_CODE: {
 				bool code_got = false;
 				if (next_few_bytes_are("OK")) {
+					i += 1;
 					code_got = true;
 					g_ws_server_parser.last_response = WS_SERVER_RC_OK;
-				} else if (next_few_bytes_are("ERROR") || next_few_bytes_are("FAIL")) {
+				} else if (next_few_bytes_are("ERROR")) {
+					i += 4;
+					code_got = true;
+					g_ws_server_parser.last_response = WS_SERVER_RC_ERR;
+				} else if (next_few_bytes_are("FAIL")) {
+					i += 3;
 					code_got = true;
 					g_ws_server_parser.last_response = WS_SERVER_RC_ERR;
 				} else if (next_few_bytes_are("busy p...")) {
+					i += 8;
 					code_got = true;
 					g_ws_server_parser.last_response = WS_SERVER_RC_BUSY;
 				}
@@ -80,49 +87,49 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 				if (next_few_bytes_are("+IPD,")) {
 					i += 4; // skip I, P, D, and comma
 					g_ws_server_parser.mode = WS_SERVER_LM_IPD_LISTENING;
-				} else if (next_few_bytes_are("> ")) {
+				} else if (next_few_bytes_are(">")) { // ">" on official espressif firmware, "> " on ai-thinker firmware
 					g_ws_server_parser.mode = WS_SERVER_LM_CIPSEND_LISTENING;
 					ws_server_buffer_send_finish();
 				}
 				break;
 			}
 			case WS_SERVER_LM_IPD_LISTENING: {
-					switch (g_ws_server_parser.channel_listen_mode) {
-						case WS_SERVER_CL_CHANNEL_ID: {
-							if (byte == ',') {
-								g_ws_server_parser.channel_listen_mode = WS_SERVER_CL_DATA_LENGTH;
-								break;
-							}
-							g_ws_server_parser.current_channel *= 10;
-							g_ws_server_parser.current_channel += byte - '0'; // ascii to int
+				switch (g_ws_server_parser.channel_listen_mode) {
+					case WS_SERVER_CL_CHANNEL_ID: {
+						if (byte == ',') {
+							g_ws_server_parser.channel_listen_mode = WS_SERVER_CL_DATA_LENGTH;
 							break;
 						}
-						case WS_SERVER_CL_DATA_LENGTH: {
-							if (byte == ':') {
-								g_ws_server_parser.channel_listen_mode = WS_SERVER_CL_DATA_READ;
-								if (g_ws_server_parser.channel_data_length > WS_PROTOCOL_CMD_BUFFER_LEN)
-									g_ws_server_parser.channel_data_ignore = true;
-								break;
-							}
-							g_ws_server_parser.channel_data_length *= 10;
-							g_ws_server_parser.channel_data_length += byte - '0'; // ascii to int
-							break;
-						}
-						case WS_SERVER_CL_DATA_READ: {
-							ws_server_req_parse_byte(g_ws_server_parser.current_channel, byte, g_ws_server_parser.channel_data_ignore);
-							g_ws_server_parser.channel_data_counter++;
-							if (g_ws_server_parser.channel_data_counter == g_ws_server_parser.channel_data_length) {
-								g_ws_server_parser.current_channel = 0;
-								g_ws_server_parser.channel_data_counter = 0;
-								g_ws_server_parser.channel_data_length = 0;
-								g_ws_server_parser.channel_listen_mode = WS_SERVER_CL_CHANNEL_ID;
-								ws_server_req_finish(g_ws_server_parser.current_channel, g_ws_server_parser.channel_data_ignore);
-								g_ws_server_parser.mode = WS_SERVER_LM_IDLE;
-							}
-							break;
-						}
-						default: {}
+						g_ws_server_parser.current_channel *= 10;
+						g_ws_server_parser.current_channel += byte - '0'; // ascii to int
+						break;
 					}
+					case WS_SERVER_CL_DATA_LENGTH: {
+						if (byte == ':') {
+							g_ws_server_parser.channel_listen_mode = WS_SERVER_CL_DATA_READ;
+							if (g_ws_server_parser.channel_data_length > WS_PROTOCOL_CMD_BUFFER_LEN)
+								g_ws_server_parser.channel_data_ignore = true;
+							break;
+						}
+						g_ws_server_parser.channel_data_length *= 10;
+						g_ws_server_parser.channel_data_length += byte - '0'; // ascii to int
+						break;
+					}
+					case WS_SERVER_CL_DATA_READ: {
+						ws_server_req_parse_byte(g_ws_server_parser.current_channel, byte, g_ws_server_parser.channel_data_ignore);
+						g_ws_server_parser.channel_data_counter++;
+						if (g_ws_server_parser.channel_data_counter == g_ws_server_parser.channel_data_length) {
+							g_ws_server_parser.current_channel = 0;
+							g_ws_server_parser.channel_data_counter = 0;
+							g_ws_server_parser.channel_data_length = 0;
+							g_ws_server_parser.channel_listen_mode = WS_SERVER_CL_CHANNEL_ID;
+							ws_server_req_finish(g_ws_server_parser.current_channel, g_ws_server_parser.channel_data_ignore);
+							g_ws_server_parser.mode = WS_SERVER_LM_IDLE;
+						}
+						break;
+					}
+					default: {}
+				}
 				break;
 			}
 			case WS_SERVER_LM_CIPSEND_LISTENING: {
@@ -151,15 +158,26 @@ void ws_server_buffer_send_append(uint8_t* data, size_t size) {
 
 // TODO: refactor this
 void ws_server_buffer_send_finish() {
+	/* const int chunk_size = 16; // esp is garbage
+
+	for (unsigned int chunk = 0; chunk <= (g_ws_esp8266_dma_tx_buffer_size / chunk_size); chunk++) {
+		HAL_UART_Transmit_DMA(&huart1, &g_ws_esp8266_dma_tx_buffer[chunk_size * chunk], WS_MIN(chunk_size, g_ws_esp8266_dma_tx_buffer_size % chunk_size));
+		__HAL_UART_ENABLE_IT(&huart1, UART_IT_TXE);
+		while (!__HAL_DMA_GET_FLAG(&hdma_usart1_tx, DMA_FLAG_TC2));
+	} */
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
-	ws_dbg_set_usart2_tty_color(2);
+	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_TX);
 	HAL_UART_Transmit(&huart2, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_size, 100);
 #endif
 
-	HAL_UART_Transmit_DMA(&huart1, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_size);
-	__HAL_UART_ENABLE_IT(&huart1, UART_IT_TXE);
+	HAL_UART_Transmit(&huart1, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_size, 100);
+	// for (unsigned j = 0; j < 10000; j++) asm("nop"); // esp garbage
+	// for (unsigned int i = 0; i < g_ws_esp8266_dma_tx_buffer_size; i++) {
+	// 	// send as slow as possible because the esp is garbage
+	// 	for (unsigned j = 0; j < 1000; j++) asm("nop"); // did i mention the esp is garbage
+	// 	HAL_UART_Transmit(&huart1, &g_ws_esp8266_dma_tx_buffer[i], 1, 100);
+	// }
 	g_ws_esp8266_dma_tx_buffer_size = 0;
-	while (!__HAL_DMA_GET_FLAG(&hdma_usart1_tx, DMA_FLAG_TC2));
 }
 
 // TODO: refactor this

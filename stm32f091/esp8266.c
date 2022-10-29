@@ -58,7 +58,7 @@ void ws_esp8266_send(uint8_t* data, size_t size) {
 	g_ws_esp8266_dma_tx_buffer[limited_size] = 0x00;
 
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
-	ws_dbg_set_usart2_tty_color(2);
+	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_TX);
 	HAL_UART_Transmit(&huart2, g_ws_esp8266_dma_tx_buffer, strlen((char*) g_ws_esp8266_dma_tx_buffer), 100);
 #endif
 

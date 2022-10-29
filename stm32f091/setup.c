@@ -97,18 +97,18 @@ void ws_io_setup() {
 	// ws_backlog_alloc(10);
 
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
-	ws_dbg_set_usart2_tty_color(7);
+	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_DBGMSG);
 	const char restart_str[] = "\r\n--- stm restart ---\r\n";
-	HAL_UART_Transmit(&huart2, restart_str, strlen(restart_str), 100);
+	HAL_UART_Transmit(&huart2, (uint8_t*) restart_str, strlen(restart_str), 100);
 #endif
 
+	ws_esp8266_ap_client_mode();
 #ifdef WS_ESP8266_WLAN_MAC
 	ws_esp8266_set_mac();
 #endif
 #ifdef WS_ESP8266_WLAN_IP
 	ws_esp8266_set_ip();
 #endif
-	ws_esp8266_ap_client_mode();
 	do ws_esp8266_connect(); while (g_ws_server_parser.last_response == WS_SERVER_RC_ERR);
 	ws_esp8266_start_tcp_server();
 }
