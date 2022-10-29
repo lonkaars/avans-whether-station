@@ -1,18 +1,18 @@
 QT += core gui sql charts network
 
 HEADERS += \
+	Client.h \
+	HandleMessage.h \
 	dbconnector.h \
 	main.h \
-	mainwindow.h \
-	mytcpsocket.h \
-	timetest.h
+	mainwindow.h
 
 SOURCES += \
+	Client.cpp \
+	HandleMessage.cpp \
 	dbconnector.cpp \
 	main.cpp \
-	mainwindow.cpp \
-	mytcpsocket.cpp \
-	timetest.cpp
+	mainwindow.cpp
 
 
 FORMS += \

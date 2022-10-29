@@ -14,17 +14,12 @@
 #include "mainwindow.h"
 #include "main.h"
 #include "ui_mainwindow.h"
-#include "mytcpsocket.h"
-#include "timetest.h"
 
 QSqlDatabase dbRef = QSqlDatabase();
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	TimeTest time;
-	MyTcpSocket s;
-	// s.doConnect();
     MainWindow w;
 
     dbRef = QSqlDatabase::addDatabase("QMYSQL");
