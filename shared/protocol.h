@@ -5,7 +5,7 @@
 
 #include "bin.h"
 
-#define WS_PROTOCOL_CMD_MAX_ARGUMENTS (2)
+#define WS_PROTOCOL_CMD_MAX_ARGUMENTS (3)
 #define WS_PROTOCOL_CMD_BUFFER_LEN (40)
 
 #define WS_PROTOCOL_CMD_AMOUNT (1)
