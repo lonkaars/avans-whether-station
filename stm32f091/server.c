@@ -18,10 +18,14 @@ ws_s_server_parser g_ws_server_parser = {
 	.channel_data_length = 0,
 	.channel_data_counter = 0,
 	.channel_listen_mode = WS_SERVER_CL_CHANNEL_ID,
+
+	.rc = { 0 },
 };
 
 static ws_s_protocol_req_parser_state* g_ws_protocol_parsers[WS_SERVER_MAX_CHANNELS] = {0};
-static unsigned int g_ws_esp8266_dma_tx_buffer_size = 0;
+static unsigned int g_ws_esp8266_dma_tx_buffer_head = 0;
+static unsigned int g_ws_esp8266_dma_tx_buffer_tail = 0;
+static unsigned int g_ws_esp8266_dma_tx_buffer_cs = 0; // chunk size
 
 void ws_server_req_parse_byte(unsigned int channel, uint8_t byte, bool ignore) {
 	if (ignore) return;
@@ -44,6 +48,13 @@ void ws_server_req_finish(unsigned int channel, bool ignore) {
 	}
 }
 
+static bool ws_server_is_response(char data, uint8_t* counter, const char* cmd, unsigned short cmd_len) {
+	if (data == cmd[*counter]) *counter += 1;
+	else *counter = 0;
+	if (*counter == cmd_len) return true;
+	return false;
+}
+
 // TODO: next_few_bytes_are assumes that the complete search string is in the
 // buffer, so won't work for buffer cutoffs
 #define next_few_bytes_are(code) (((i + sizeof(code) - 2) < size) && (strncmp((char*)&data[i], code, sizeof(code) - 1) == 0))
@@ -63,20 +74,16 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 			}
 			case WS_SERVER_LM_STATUS_CODE: {
 				bool code_got = false;
-				if (next_few_bytes_are("OK")) {
-					i += 1;
+				if (ws_server_is_response(byte, &g_ws_server_parser.rc.s_ok, "OK", 2)) {
 					code_got = true;
 					g_ws_server_parser.last_response = WS_SERVER_RC_OK;
-				} else if (next_few_bytes_are("ERROR")) {
-					i += 4;
+				} else if (ws_server_is_response(byte, &g_ws_server_parser.rc.s_error, "ERROR", 5)) {
 					code_got = true;
 					g_ws_server_parser.last_response = WS_SERVER_RC_ERR;
-				} else if (next_few_bytes_are("FAIL")) {
-					i += 3;
+				} else if (ws_server_is_response(byte, &g_ws_server_parser.rc.s_fail, "FAIL", 4)) {
 					code_got = true;
 					g_ws_server_parser.last_response = WS_SERVER_RC_ERR;
-				} else if (next_few_bytes_are("busy p...")) {
-					i += 8;
+				} else if (ws_server_is_response(byte, &g_ws_server_parser.rc.s_busy, "busy p...", 9)) {
 					code_got = true;
 					g_ws_server_parser.last_response = WS_SERVER_RC_BUSY;
 				}
@@ -84,12 +91,12 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 				break;
 			}
 			case WS_SERVER_LM_IDLE: {
-				if (next_few_bytes_are("+IPD,")) {
-					i += 4; // skip I, P, D, and comma
+				if (ws_server_is_response(byte, &g_ws_server_parser.rc.i_ipd, "+IPD,", 5)) {
 					g_ws_server_parser.mode = WS_SERVER_LM_IPD_LISTENING;
-				} else if (next_few_bytes_are(">")) { // ">" on official espressif firmware, "> " on ai-thinker firmware
+				} else if (ws_server_is_response(byte, &g_ws_server_parser.rc.i_prompt, ">", 1)) {
+					// ^^^ this is ">" on official espressif firmware, "> " on ai-thinker firmware
 					g_ws_server_parser.mode = WS_SERVER_LM_CIPSEND_LISTENING;
-					ws_server_buffer_send_finish();
+					ws_server_buffer_send_chunk();
 				}
 				break;
 			}
@@ -125,6 +132,7 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 							g_ws_server_parser.channel_listen_mode = WS_SERVER_CL_CHANNEL_ID;
 							ws_server_req_finish(g_ws_server_parser.current_channel, g_ws_server_parser.channel_data_ignore);
 							g_ws_server_parser.mode = WS_SERVER_LM_IDLE;
+							ws_server_buffer_request_chunk_send();
 						}
 						break;
 					}
@@ -133,14 +141,21 @@ void ws_server_req_incoming(uint8_t* data, size_t size) {
 				break;
 			}
 			case WS_SERVER_LM_CIPSEND_LISTENING: {
-				if (next_few_bytes_are("SEND OK") || next_few_bytes_are("ERROR")) {
-					ws_server_req_respond_end(0);
+				if (ws_server_is_response(byte, &g_ws_server_parser.rc.l_send_ok, "SEND OK", 7) || ws_server_is_response(byte, &g_ws_server_parser.rc.l_error, "ERROR", 5)) {
+					ws_server_buffer_request_chunk_send();
 				}
 				break;
 			}
 			default: {}
 		}
 	}
+}
+
+/** @brief get amount of bytes in g_ws_esp8266_dma_tx_buffer until \n */
+static unsigned int ws_server_next_line_length() {
+	for (unsigned int i = g_ws_esp8266_dma_tx_buffer_tail; i <= g_ws_esp8266_dma_tx_buffer_head; i++)
+		if (g_ws_esp8266_dma_tx_buffer[i] == '\n') return i - g_ws_esp8266_dma_tx_buffer_tail + 1;
+	return g_ws_esp8266_dma_tx_buffer_head - g_ws_esp8266_dma_tx_buffer_tail;
 }
 
 void ws_server_send(uint8_t* data, size_t size) {
@@ -152,43 +167,52 @@ void ws_server_send(uint8_t* data, size_t size) {
 void ws_server_buffer_send_append(uint8_t* data, size_t size) {
 	// TODO: buffer overrun protection
 	// while (!__HAL_DMA_GET_FLAG(&hdma_usart1_tx, DMA_FLAG_TC2)); // make sure buffer isn't used
-	strncpy((char*) &g_ws_esp8266_dma_tx_buffer[g_ws_esp8266_dma_tx_buffer_size], (char*) data, size); // append string
-	g_ws_esp8266_dma_tx_buffer_size += size; // shift head
+	strncpy((char*) &g_ws_esp8266_dma_tx_buffer[g_ws_esp8266_dma_tx_buffer_head], (char*) data, size); // append string
+	g_ws_esp8266_dma_tx_buffer_head += size; // shift head
 }
 
-// TODO: refactor this
-void ws_server_buffer_send_finish() {
-	/* const int chunk_size = 16; // esp is garbage
+void ws_server_buffer_request_chunk_send() {
+	g_ws_esp8266_dma_tx_buffer_cs = ws_server_next_line_length();
 
-	for (unsigned int chunk = 0; chunk <= (g_ws_esp8266_dma_tx_buffer_size / chunk_size); chunk++) {
-		HAL_UART_Transmit_DMA(&huart1, &g_ws_esp8266_dma_tx_buffer[chunk_size * chunk], WS_MIN(chunk_size, g_ws_esp8266_dma_tx_buffer_size % chunk_size));
-		__HAL_UART_ENABLE_IT(&huart1, UART_IT_TXE);
-		while (!__HAL_DMA_GET_FLAG(&hdma_usart1_tx, DMA_FLAG_TC2));
-	} */
+	char* cmd = NULL;
+	size_t len;
+
+	if (g_ws_esp8266_dma_tx_buffer_cs > 0) {
+		len = asiprintf(&cmd, "AT+CIPSEND=%d,%d\r\n", g_ws_server_parser.current_channel, g_ws_esp8266_dma_tx_buffer_cs);
+	} else {
+		len = asiprintf(&cmd, "AT+CIPCLOSE=%d\r\n", g_ws_server_parser.current_channel);
+	}
+
+	g_ws_server_parser.mode = WS_SERVER_LM_CMD_ECHO;
+
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
 	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_TX);
+	HAL_UART_Transmit(&huart2, (uint8_t*) cmd, len, 100);
 #endif
-
-	// HAL_UART_Transmit(&huart1, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_size, 100);
-	for (unsigned j = 0; j < 1000000; j++) asm("nop"); // esp garbage
-	for (unsigned int i = 0; i < g_ws_esp8266_dma_tx_buffer_size; i++) {
-		// send as slow as possible because the esp is garbage
-		for (unsigned j = 0; j < 10000; j++) asm("nop"); // did i mention the esp is garbage
-		HAL_UART_Transmit(&huart1, &g_ws_esp8266_dma_tx_buffer[i], 1, 100);
-#ifdef WS_DBG_PRINT_ESP_OVER_USART2
-		HAL_UART_Transmit(&huart2, &g_ws_esp8266_dma_tx_buffer[i], 1, 100);
-#endif
-	}
-	g_ws_esp8266_dma_tx_buffer_size = 0;
+	HAL_UART_Transmit(&huart1, (uint8_t*) cmd, len, 100);
 }
 
-// TODO: refactor this
-void ws_server_req_respond_start(unsigned int channel, size_t size) {
-	char* cmd = NULL;
-	size_t len = asiprintf(&cmd, "AT+CIPSEND=%d,%d\r\n", channel, size);
-	g_ws_server_parser.mode = WS_SERVER_LM_CMD_ECHO;
-	ws_esp8266_send((uint8_t*) cmd, len);
-	while (!__HAL_DMA_GET_FLAG(&hdma_usart1_tx, DMA_FLAG_TC2));
+void ws_server_buffer_send_chunk() {
+#ifdef WS_DBG_PRINT_ESP_OVER_USART2
+	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_TX);
+ 	HAL_UART_Transmit(&huart2, &g_ws_esp8266_dma_tx_buffer[g_ws_esp8266_dma_tx_buffer_tail], g_ws_esp8266_dma_tx_buffer_cs, 100);
+#endif
+ 	HAL_UART_Transmit(&huart1, &g_ws_esp8266_dma_tx_buffer[g_ws_esp8266_dma_tx_buffer_tail], g_ws_esp8266_dma_tx_buffer_cs, 100);
+	g_ws_esp8266_dma_tx_buffer_tail += g_ws_esp8266_dma_tx_buffer_cs;
+
+	if (g_ws_esp8266_dma_tx_buffer_head == g_ws_esp8266_dma_tx_buffer_tail) {
+		g_ws_esp8266_dma_tx_buffer_head = g_ws_esp8266_dma_tx_buffer_tail = 0;
+	}
+
+// #ifdef WS_DBG_PRINT_ESP_OVER_USART2
+// 	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_TX);
+// 	HAL_UART_Transmit(&huart2, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_head, 100);
+// #endif
+// 
+// 	HAL_UART_Transmit(&huart1, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_head, 100);
+// 	g_ws_esp8266_dma_tx_buffer_head = 0;
+// 
+// 	HAL_UART_Transmit(&huart1, (uint8_t*) "+++", 3, 100);
 }
 
 // TODO: refactor this

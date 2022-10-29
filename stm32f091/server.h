@@ -26,6 +26,17 @@ typedef enum {
 } ws_e_server_response_code;
 
 typedef struct {
+	uint8_t s_ok; /** @brief status code OK */
+	uint8_t s_error; /** @brief status code OK */
+	uint8_t s_fail; /** @brief status code OK */
+	uint8_t s_busy; /** @brief status code OK */
+	uint8_t i_ipd; /** @brief idle +IPD, */
+	uint8_t i_prompt; /** @brief idle > */
+	uint8_t l_send_ok; /** @brief ipd listen SEND OK */
+	uint8_t l_error; /** @brief ipd listen ERROR */
+} ws_s_server_parser_response_counter;
+
+typedef struct {
 	ws_e_server_listen_mode mode;
 	ws_e_server_response_code last_response;
 	unsigned int current_channel;
@@ -33,6 +44,7 @@ typedef struct {
 	unsigned int channel_data_counter;
 	ws_e_channel_listen_mode channel_listen_mode;
 	bool channel_data_ignore;
+	ws_s_server_parser_response_counter rc;
 } ws_s_server_parser;
 
 /** @brief global server parser struct */
@@ -50,10 +62,10 @@ extern ws_s_server_parser g_ws_server_parser;
  */
 void ws_server_req_incoming(uint8_t* data, size_t size);
 
-/** @brief send AT response header for incoming request on specific channel */
-void ws_server_req_respond_start(unsigned int channel, size_t size);
-/** @brief send AT tcp close on specific channel */
-void ws_server_req_respond_end(unsigned int channel);
+// /** @brief send AT response header for incoming request on specific channel */
+// void ws_server_req_respond_start(unsigned int channel);
+// /** @brief send AT tcp close on specific channel */
+// void ws_server_req_respond_end(unsigned int channel);
 
 /** @brief send data to esp, waiting until server returns to idle mode */
 void ws_server_send(uint8_t* data, size_t size);
@@ -82,4 +94,6 @@ void ws_server_req_parse_byte(unsigned int channel, uint8_t byte, bool ignore);
 void ws_server_req_finish(unsigned int channel, bool ignore);
 
 void ws_server_buffer_send_append(uint8_t* data, size_t size);
-void ws_server_buffer_send_finish();
+
+void ws_server_buffer_request_chunk_send();
+void ws_server_buffer_send_chunk();

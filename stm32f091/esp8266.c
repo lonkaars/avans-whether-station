@@ -75,9 +75,9 @@ void ws_esp8266_ap_client_mode() {
 }
 
 void ws_esp8266_start_tcp_server() {
-	ws_esp8266_send_seq("AT+CIPSERVER=0\r\n");
-	ws_esp8266_send_seq("AT+CIPMUX=1\r\n");
-	ws_esp8266_send_seq("AT+CIPSERVER=1," WS_SERVER_PORT "\r\n");
+	ws_esp8266_send_seq("AT+CIPSERVER=0\r\n"); // stop tcp server (if running)
+	ws_esp8266_send_seq("AT+CIPMUX=1\r\n"); // enable multiplexing (allow multiple connections)
+	ws_esp8266_send_seq("AT+CIPSERVER=1," WS_SERVER_PORT "\r\n"); // start tcp server
 }
 
 void ws_esp8266_set_mac() {

@@ -2,7 +2,7 @@
 
 - [ ] more documentation in header files (for both client and stm code)
 - [ ] design/architecture document
-- [ ] more tests in the test document
+- [x] more tests in the test document
 - [ ] handle errors from `AT+CIPSEND`, these look like this:
       ```
       > AT0,CONNECT
