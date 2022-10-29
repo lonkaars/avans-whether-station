@@ -167,16 +167,18 @@ void ws_server_buffer_send_finish() {
 	} */
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
 	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_TX);
-	HAL_UART_Transmit(&huart2, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_size, 100);
 #endif
 
-	HAL_UART_Transmit(&huart1, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_size, 100);
-	// for (unsigned j = 0; j < 10000; j++) asm("nop"); // esp garbage
-	// for (unsigned int i = 0; i < g_ws_esp8266_dma_tx_buffer_size; i++) {
-	// 	// send as slow as possible because the esp is garbage
-	// 	for (unsigned j = 0; j < 1000; j++) asm("nop"); // did i mention the esp is garbage
-	// 	HAL_UART_Transmit(&huart1, &g_ws_esp8266_dma_tx_buffer[i], 1, 100);
-	// }
+	// HAL_UART_Transmit(&huart1, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_size, 100);
+	for (unsigned j = 0; j < 1000000; j++) asm("nop"); // esp garbage
+	for (unsigned int i = 0; i < g_ws_esp8266_dma_tx_buffer_size; i++) {
+		// send as slow as possible because the esp is garbage
+		for (unsigned j = 0; j < 10000; j++) asm("nop"); // did i mention the esp is garbage
+		HAL_UART_Transmit(&huart1, &g_ws_esp8266_dma_tx_buffer[i], 1, 100);
+#ifdef WS_DBG_PRINT_ESP_OVER_USART2
+		HAL_UART_Transmit(&huart2, &g_ws_esp8266_dma_tx_buffer[i], 1, 100);
+#endif
+	}
 	g_ws_esp8266_dma_tx_buffer_size = 0;
 }
 
