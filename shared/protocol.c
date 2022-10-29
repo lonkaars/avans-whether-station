@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "protocol.h"
+#include "util.h"
 
 #define WS_CMD_MAP(parsed_cmd, name, code) \
 	if (strlen(parsed_cmd->argv[0]) == strlen(name) && strncmp(parsed_cmd->argv[0], name, strlen(name)) == 0) return code;
@@ -98,10 +99,11 @@ ws_s_protocol_req_parser_state* ws_protocol_req_parser_alloc() {
 
 void ws_protocol_req_cmd_init(ws_s_protocol_req_parser_state* state) {
 	state->target = malloc(sizeof(ws_s_protocol_parsed_req_cmd) + sizeof(char*) * state->arg_len);
-	for (unsigned int i = 0; i < state->arg_len; i++)
+	unsigned int args = WS_MIN(state->arg_len, WS_PROTOCOL_CMD_MAX_ARGUMENTS);
+	for (unsigned int i = 0; i < args; i++)
 		state->target->argv[i] = malloc(sizeof(char) * (state->args_len[i] + 1));
 
-	state->target->argc = state->arg_len;
+	state->target->argc = args;
 
 	unsigned int head = 0;
 	for (unsigned int i = 0; i < state->arg_len; i++) {
@@ -134,4 +136,12 @@ void ws_protocol_req_cmd_free(ws_s_protocol_parsed_req_cmd* cmd) {
 		free(cmd->argv[i]);
 	free(cmd);
 	return;
+}
+
+unsigned short ws_protocol_get_header_size(ws_s_protocol_res* response) {
+	unsigned short size = 2; // comma and trailing newline
+	if (response->success == WS_PROTOCOL_CMD_RETURN_OK) size += 2; // ok
+	if (response->success == WS_PROTOCOL_CMD_RETURN_ERROR) size += 5; // error
+	size += ws_log16(response->msg->bytes) + 1; // amount of characters for message size (hex)
+	return size;
 }

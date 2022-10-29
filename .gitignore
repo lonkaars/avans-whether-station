@@ -18,4 +18,5 @@ shared/main
 .qmake.stash
 .vscode/.cortex-debug.registers.state.json
 copyright
+temp/
 
