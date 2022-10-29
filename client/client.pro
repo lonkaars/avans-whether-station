@@ -1,6 +1,7 @@
 QT += core gui sql charts network
 
 HEADERS += \
+	csv_import.h \
 	dbconnector.h \
 	main.h \
 	mainwindow.h \
@@ -8,6 +9,7 @@ HEADERS += \
 	timetest.h
 
 SOURCES += \
+	csv_import.cpp \
 	dbconnector.cpp \
 	main.cpp \
 	mainwindow.cpp \

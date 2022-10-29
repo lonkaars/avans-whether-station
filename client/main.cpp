@@ -16,6 +16,8 @@
 #include "ui_mainwindow.h"
 #include "mytcpsocket.h"
 #include "timetest.h"
+#include "csv_import.h"
+#include <QDebug>
 
 QSqlDatabase dbRef = QSqlDatabase();
 
@@ -29,7 +31,21 @@ int main(int argc, char *argv[])
 
     dbRef = QSqlDatabase::addDatabase("QMYSQL");
 
-	w.show();
+    QString input =  "000e,1d,2f,28\n000d,1d,2f,28\n000c,1d,2f,29\n000b,1d,2f,28\n000a,1d,2f,2a";
+    CSV_Import import;
+
+
+    QString output = "INSERT INTO `WSdb`.`tblMain` () VALUES ";
+    QVector<QString> list = input.split("\n");
+    for (int i = 0; i < list.size(); ++i) {
+        output.append(import.csvToSql(list[i]));
+        if (i+1 < list.size()){
+            output.append(",");
+        }
+    }
+    qDebug() << output;
+
+    w.show();
 	return a.exec();
 }
 
