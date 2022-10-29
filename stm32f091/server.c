@@ -182,6 +182,7 @@ void ws_server_buffer_request_chunk_send() {
 	} else {
 		len = asiprintf(&cmd, "AT+CIPCLOSE=%d\r\n", g_ws_server_parser.current_channel);
 	}
+	free(cmd);
 
 	g_ws_server_parser.mode = WS_SERVER_LM_CMD_ECHO;
 
@@ -222,4 +223,5 @@ void ws_server_req_respond_end(unsigned int channel) {
 	g_ws_server_parser.mode = WS_SERVER_LM_CMD_ECHO;
 	ws_esp8266_send((uint8_t*) cmd, len);
 	while (!__HAL_DMA_GET_FLAG(&hdma_usart1_tx, DMA_FLAG_TC2));
+	free(cmd);
 }
