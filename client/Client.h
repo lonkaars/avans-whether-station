@@ -21,7 +21,7 @@ public:
 public slots:
     void ClientEcho(); // function to ask data from wheather station
     void timeFunction();  // function to look every second what time currently is en handle if minute is passed
-
+    bool refreshChart;
 private:
     void missingRecords();
 
@@ -37,6 +37,7 @@ private:
 
     uint8_t totalRecords = 1;  // total records to ask wheather station
     uint8_t offsetRecords = 0; // offset from reqeusting records
+
 };
 
 #endif // CLIENT_H

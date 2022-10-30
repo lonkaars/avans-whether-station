@@ -25,6 +25,12 @@ MainWindow::~MainWindow()
 void MainWindow::timeFunction()
 {
     client.timeFunction();
+    if(client.refreshChart==true){
+        drawGraph();
+        client.refreshChart=false;
+    }
+
+
 }
 
 void MainWindow::on_actionConnection_triggered()
@@ -35,7 +41,7 @@ void MainWindow::on_actionConnection_triggered()
 
 void MainWindow::on_actionRefresh_triggered()
 {
-    drawGraph();
+   // drawGraph();
 }
 
 void MainWindow::on_actionDisconnenct_triggered()

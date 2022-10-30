@@ -34,6 +34,7 @@ void Client::ClientEcho() {
 	connect(socket, &QTcpSocket::disconnected, [&]() {
 		socket->disconnectFromHost();
 		lineCounter = 0;
+        refreshChart=true;
 	});
 
 	timer->start(1000);
@@ -52,6 +53,8 @@ void Client::timeFunction() {
 
 	socket->connectToHost(networkAddress, tcpPortAddress);
 	socket->write(msgToSend);
+
+
 }
 
 void Client::missingRecords() {
