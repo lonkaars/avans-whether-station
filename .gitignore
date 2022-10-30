@@ -12,6 +12,7 @@ stm32f091/wifi.h
 client/makefile
 client/client
 client/moc_*
+**/.user
 
 # others
 shared/main
