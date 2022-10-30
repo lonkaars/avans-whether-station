@@ -1,5 +1,8 @@
-#include "Client.h"
+#include <stdio.h>
 
+#include "Client.h"
+#include "consts.h"
+#include "../shared/util.h"
 
 
 Client::Client(QObject *parent) : QObject(parent)
@@ -17,8 +20,6 @@ Client::~Client()
 
 void Client::ClientEcho()
 {
-    QTime time1 = QTime::currentTime();
-    NextMinute = time1.minute()+1;
 
     connect(timer, SIGNAL(timeout()),this,SLOT(timeFunction())); // connect timer to time every minute
 
@@ -36,22 +37,19 @@ void Client::ClientEcho()
 
 void Client::timeFunction()
 {
-    if(_missingRecords>1){
-        totalRecords = _missingRecords;
-    }
-    else{
-        totalRecords=1;
-    }
-    QByteArray msgToSend= (msg.toUtf8() + totalRecords + offsetRecords +'\n');
+    totalRecords = WS_MAX(1, _missingRecords);
+
+    char* msg = NULL;
+    asprintf(&msg, "last-records %x %x\n", totalRecords, offsetRecords);
+    QByteArray msgToSend = msg;
+    free(msg);
 
     QTime time = QTime::currentTime();
-    qint16 currentMinute = time.minute();
+    qint16 currentSeconds = time.second();
+    if((currentSeconds % WS_CLIENT_STATION_POLL_INTERVAL) == 1){
 
-    if(currentMinute==NextMinute){
         socket->connectToHost(networkAddress, tcpPortAddress);
-
         socket->write(msgToSend);
-        NextMinute++;
     }
 }
 
