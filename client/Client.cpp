@@ -1,5 +1,8 @@
+#include <stdio.h>
+
 #include "Client.h"
 #include "consts.h"
+#include "../shared/util.h"
 
 
 Client::Client(QObject *parent) : QObject(parent)
@@ -34,13 +37,12 @@ void Client::ClientEcho()
 
 void Client::timeFunction()
 {
-    if(_missingRecords>1){
-        totalRecords = _missingRecords;
-    }
-    else{
-        totalRecords=1;
-    }
-    QByteArray msgToSend= (msg.toUtf8() + totalRecords + offsetRecords +'\n');
+    totalRecords = WS_MAX(1, _missingRecords);
+
+    char* msg = NULL;
+    asprintf(&msg, "last-records %x %x\n", totalRecords, offsetRecords);
+    QByteArray msgToSend = msg;
+    free(msg);
 
     QTime time = QTime::currentTime();
     qint16 currentSeconds = time.second();

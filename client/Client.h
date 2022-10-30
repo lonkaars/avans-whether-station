@@ -35,9 +35,8 @@ private:
     int tcpPortAddress = WS_SERVER_PORT; // port of communication via tcp
     QString networkAddress = WS_ESP8266_WLAN_IP; // network address for commincation via tcp
 
-    QString msg = "last-records "; // part of mesage to send to wheather staion
-    char totalRecords = '1';  // total records to ask wheather station
-    char offsetRecords = '0'; // offset from reqeusting records
+    uint8_t totalRecords = 1;  // total records to ask wheather station
+    uint8_t offsetRecords = 0; // offset from reqeusting records
 };
 
 #endif // CLIENT_H
