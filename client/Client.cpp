@@ -54,9 +54,11 @@ void Client::timeFunction() {
 	socket->write(msgToSend);
 }
 
-void Client::missingRecords() {
-	QSqlQuery queryTimeData;
-	queryTimeData.exec("select unix_timestamp(now()) - unix_timestamp(time) as delta from WSdb.tblMain order by time desc limit 1");
+void Client::missingRecords()
+{
+    QSqlQuery queryTimeData;
+    queryTimeData.exec("SELECT (unix_timestamp(now()) - unix_timestamp(`time`))/60 as delta FROM `tblMain` limit 1");
+
 	queryTimeData.first();
 	unsigned int secondsSinceLastRecord = queryTimeData.value(0).toInt();
 	_missingRecords = secondsSinceLastRecord / WS_CLIENT_STATION_POLL_INTERVAL;

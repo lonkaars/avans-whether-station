@@ -19,6 +19,9 @@ public:
     explicit dbConnector(QWidget *parent = nullptr);
     ~dbConnector();
 
+    static QString getdbName();
+    static QString getEspHost();
+
 private slots:
 
     void on_pushButton_cancel_clicked();
