@@ -58,6 +58,12 @@ void ws_sensor_read() {
 		.sens_humidity = ws_sensor_humidity()
 	};
 	ws_backlog_add_record(record);
+
+	// < DEBUG PROTOCOL PARSING CODE >
+	// ws_s_protocol_req_parser_state* parser = ws_protocol_req_parser_alloc();
+	// const char* request = "last-records 5\n";
+	// ws_protocol_parse_req_bytes(parser, (char*) request, strlen(request));
+	// ws_protocol_req_parser_free(parser);
 }
 
 void ws_sensor_read_task() {

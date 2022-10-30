@@ -13,6 +13,7 @@
 #include <QWidgetSet>
 
 #include "main.h"
+#include "Client.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -33,7 +34,7 @@ private slots:
 //    void on_actionAbout_triggered();
 
 //    void on_pushButton_clicked();
-
+    void timeFunction();
     void on_actionConnection_triggered();
 
     void on_actionRefresh_triggered();
@@ -42,7 +43,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
+    Client client;
     dbConnector *_dbConenctor;
 
     QChart *_pChart;

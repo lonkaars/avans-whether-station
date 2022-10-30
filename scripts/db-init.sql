@@ -1,9 +1,11 @@
-CREATE SCHEMA `WSdb`;
-CREATE TABLE `DAB1Pract1`.`tblMain` (
-  `ID` INT GENERATED ALWAYS AS (),
-  `temperature` DECIMAL(5,2) NULL,
-  `humidity` DECIMAL(5,2) NULL,
-  `pressure` DECIMAL(5,2) NULL,
-  `time` DATETIME NULL,
-  PRIMARY KEY (`ID`),
-  UNIQUE INDEX `ID_UNIQUE` (`ID` ASC) VISIBLE);
+drop schema if exists `WSdb`;
+create schema if not exists `WSdb`;
+drop table if exists `WSdb`.`tblMain`;
+create table if not exists `WSdb`.`tblMain` (
+  id int unsigned not null auto_increment,
+  temperature decimal(5,2) null,
+  humidity decimal(5,2) null,
+  pressure decimal(5,2) null,
+  time datetime null,
+  primary key (id)
+);

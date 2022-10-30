@@ -11,12 +11,18 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    client.ClientEcho();
 }
 
 MainWindow::~MainWindow()
 {
     dbRef.close();
     delete ui;
+}
+
+void MainWindow::timeFunction()
+{
+    client.timeFunction();
 }
 
 void MainWindow::on_actionConnection_triggered()
