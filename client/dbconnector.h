@@ -19,8 +19,8 @@ public:
     explicit dbConnector(QWidget *parent = nullptr);
     ~dbConnector();
 
-    static QString getdbName();
-    static QString getEspHost();
+    QString getdbName();
+    QString getEspHost();
 
 private slots:
 
