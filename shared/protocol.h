@@ -148,4 +148,6 @@ static ws_protocol_res_handler_t* g_ws_protocol_res_handlers[WS_PROTOCOL_CMD_AMO
 	[WS_PROTOCOL_CMD_LAST_RECORDS] = &ws_protocol_res_last_records,
 };
 
+/** @brief return length of custom protocol header */
 unsigned short ws_protocol_get_header_size(ws_s_protocol_res* response);
+
