@@ -45,6 +45,7 @@ private:
     Ui::MainWindow *ui;
     Client client;
     dbConnector *_dbConenctor;
+    QTimer      *timer; // timer to read every second what time it curruntly is.
 
     QChart *_pChart;
 //    QLineSeries *_pSeries;

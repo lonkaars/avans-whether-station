@@ -17,11 +17,11 @@ class Client : public QObject
 public:
     Client(QObject *parent = 0);
     virtual ~Client();
+    bool refreshChart;
 
 public slots:
     void ClientEcho(); // function to ask data from wheather station
     void timeFunction();  // function to look every second what time currently is en handle if minute is passed
-    bool refreshChart;
 private:
     void missingRecords();
 

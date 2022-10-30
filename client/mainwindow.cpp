@@ -12,6 +12,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     client.ClientEcho();
+		timer = new QTimer(this);
+		connect(timer, SIGNAL(timeout()), this, SLOT(timeFunction()));
+		timer->start(1000);
     _dbConenctor = new dbConnector(this);
 }
 
@@ -22,15 +25,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::timeFunction()
-{
-    client.timeFunction();
-    if(client.refreshChart==true){
-        drawGraph();
-        client.refreshChart=false;
-    }
-
-
+void MainWindow::timeFunction() {
+	printf("timeFunction\n");
+	client.timeFunction(); // segfault ->?
+	if(client.refreshChart == true){
+		client.refreshChart = false;
+		printf("redrawing...\n");
+		drawGraph();
+	}
 }
 
 void MainWindow::on_actionConnection_triggered()
@@ -41,7 +43,7 @@ void MainWindow::on_actionConnection_triggered()
 
 void MainWindow::on_actionRefresh_triggered()
 {
-   // drawGraph();
+	drawGraph();
 }
 
 void MainWindow::on_actionDisconnenct_triggered()
@@ -54,7 +56,6 @@ void MainWindow::drawGraph(){
     QLineSeries *seriesTemperature = new QLineSeries();
     QLineSeries *seriesHumidity = new QLineSeries();
     QLineSeries *seriesPressure = new QLineSeries();
-
 
     if(dbRef.open()){
         QSqlQuery queryGraphData;
