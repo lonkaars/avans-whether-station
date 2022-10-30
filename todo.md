@@ -16,9 +16,9 @@
 
 ## `// TODO:`'s
 
-- [ ] `sensor.c:24:    return (uint8_t) temp_c; //TODO: convert with range -> util.h`
-- [ ] `sensor.c:36:    return (uint8_t) humidity; //TODO: convert with range -> util.h`
-- [ ] `sensor.c:51:    return (uint8_t) val; // TODO: convert with range`
+- [x] `sensor.c:24:    return (uint8_t) temp_c; //TODO: convert with range -> util.h`
+- [x] `sensor.c:36:    return (uint8_t) humidity; //TODO: convert with range -> util.h`
+- [x] `sensor.c:51:    return (uint8_t) val; // TODO: convert with range`
 - [x] `server.c:47:// TODO: next_few_bytes_are assumes that the complete search string is in the`
 - [ ] `server.c:146:   // TODO: buffer overrun protection`
 - [x] `server.c:152:// TODO: refactor this`
