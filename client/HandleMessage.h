@@ -12,8 +12,6 @@ class HandleMessage : public QObject
     Q_OBJECT
 public:
     HandleMessage(QObject *parent = 0);
-
-    QString ParseMessage(const QString  , int);
     void ParseToSQL(QString);
 
 private:
