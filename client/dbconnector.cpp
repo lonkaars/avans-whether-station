@@ -51,3 +51,11 @@ void dbConnector::on_pushButton_login_clicked()
         QMessageBox::warning(this, "No connection", "Failed to connect");
     }
 }
+
+QString dbConnector::getdbName(){
+    return _dbName;
+}
+
+QString dbConnector::getEspHost(){
+    return _espHost;
+}

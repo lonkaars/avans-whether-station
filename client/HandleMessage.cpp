@@ -1,6 +1,5 @@
 #include "HandleMessage.h"
 
-
 HandleMessage::HandleMessage(QObject *parent) : QObject(parent)
 {
 
@@ -17,7 +16,7 @@ QString HandleMessage::ParseMessage(const QString Msg , int totalRecords )
 void HandleMessage::ParseToSQL(QString input)
 {
     QSqlQuery queryInsertData;
-    QString output = "INSERT INTO `WSdb`.`tblMain` () VALUES ";
+    QString output = "INSERT INTO `tblMain` (`temperature`, `humidity`, `pressure`) VALUES ";
     QStringList data;
     QStringList list = input.split("\n");
     for (int i = 0; i < list.size(); ++i) {

@@ -108,8 +108,5 @@ void MainWindow::drawGraph(){
     } else {
         QMessageBox::warning(this, "No connection", "Failed to connect");
     }
-//    delete seriesTemperature;
-//    delete seriesHumidity;
-//    delete seriesPressure;
 }
 

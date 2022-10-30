@@ -56,7 +56,7 @@ void Client::timeFunction()
 void Client::missingRecords()
 {
     QSqlQuery queryTimeData;
-    queryTimeData.exec("SELECT (unix_timestamp(now()) - unix_timestamp(`time`))/60 as delta FROM `WSdb`.`tblMain` limit 1");
+    queryTimeData.exec( "SELECT (unix_timestamp(now()) - unix_timestamp(`time`))/60 as delta FROM `tblMain` limit 1");
 
     _missingRecords = queryTimeData.value(0).toInt();
 
