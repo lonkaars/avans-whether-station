@@ -6,6 +6,7 @@ create table if not exists `WSdb`.`tblMain` (
   temperature decimal(5,2) null,
   humidity decimal(5,2) null,
   pressure decimal(5,2) null,
-  time datetime null,
+  time datetime default CURRENT_TIMESTAMP(),
   primary key (id)
 );
+INSERT INTO `WSdb`.`tblMain` (`ID`) VALUES (0);
