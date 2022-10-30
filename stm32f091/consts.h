@@ -1,9 +1,10 @@
 #pragma once
 
-#include "wifi.h"
+#include "../shared/wifi.h"
+#include "util.h"
 
-#define WS_SERVER_PORT "80"
 #define WS_SERVER_MAX_CHANNELS 4
+#define WS_SERVER_PORT_STR WS_MTS(WS_SERVER_PORT)
 
 #define WS_DMA_RX_BUFFER_SIZE 100
 #define WS_DMA_TX_BUFFER_SIZE 1024

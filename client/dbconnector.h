@@ -8,7 +8,6 @@
 
 #define WS_ESP8266_WLAN_IP "129.168.0.1"
 
-
 namespace Ui {
 class dbConnector;
 }

@@ -8,6 +8,10 @@
 #include "setup.h"
 #include "../shared/util.h"
 
+// macro to string macro's
+#define WS_MTS_EXPAND(x) #x
+#define WS_MTS(x) WS_MTS_EXPAND(x)
+
 #define WS_DBG_TTY_COLOR_BLK    0x0
 #define WS_DBG_TTY_COLOR_RED    0x1
 #define WS_DBG_TTY_COLOR_GRN    0x2
