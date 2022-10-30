@@ -1,5 +1,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
+
 #include <QTcpSocket>
 #include <QTextStream>
 #include <QTimer>
@@ -7,6 +8,7 @@
 #include <QSqlQuery>
 
 #include "HandleMessage.h"
+#include "../shared/wifi.h"
 
 // class client for wheather station
 class Client : public QObject
@@ -27,19 +29,15 @@ private:
     QTcpSocket *socket; // tcpsocket for communicating
     QTimer      *timer; // timer to read every second what time it curruntly is.
 
-    qint16 NextMinute; // timing for next minute
     // qint16 currentMinute; // timing for currentMinute
     HandleMessage Handlemsg; // add HandleMessage to Client.h
 
-    int tcpPortAddress = 80; // port of communication via tcp
-    QString networkAddress = "192.168.137.76"; // network address for commincation via tcp
+    int tcpPortAddress = WS_SERVER_PORT; // port of communication via tcp
+    QString networkAddress = WS_ESP8266_WLAN_IP; // network address for commincation via tcp
 
     QString msg = "last-records "; // part of mesage to send to wheather staion
     char totalRecords = '1';  // total records to ask wheather station
     char offsetRecords = '0'; // offset from reqeusting records
-
-
-
 };
 
 #endif // CLIENT_H

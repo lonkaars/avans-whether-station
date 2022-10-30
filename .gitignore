@@ -6,15 +6,16 @@
 # stm32-specific files
 stm32f091/main.elf
 stm32f091/main.bin
-stm32f091/wifi.h
 
 # client-specific files
 client/makefile
 client/client
 client/moc_*
+client/ui_*
 **/.user
 
 # others
+shared/wifi.h
 shared/main
 .qmake.stash
 .vscode/.cortex-debug.registers.state.json

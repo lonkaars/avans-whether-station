@@ -3,6 +3,7 @@ QT += core gui sql charts network
 HEADERS += \
 	Client.h \
 	HandleMessage.h \
+	consts.h \
 	dbconnector.h \
 	main.h \
 	mainwindow.h
