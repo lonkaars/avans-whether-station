@@ -143,10 +143,13 @@ ws_protocol_res_handler_t ws_protocol_res_last_records;
  */
 void ws_protocol_send_data(const char* data, unsigned int length);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 /** @brief response handlers, called when a command is parsed */
 static ws_protocol_res_handler_t* g_ws_protocol_res_handlers[WS_PROTOCOL_CMD_AMOUNT] = {
 	[WS_PROTOCOL_CMD_LAST_RECORDS] = &ws_protocol_res_last_records,
 };
+#pragma GCC diagnostic pop
 
 /** @brief return length of custom protocol header */
 unsigned short ws_protocol_get_header_size(ws_s_protocol_res* response);
