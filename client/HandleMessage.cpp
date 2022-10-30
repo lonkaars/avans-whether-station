@@ -24,9 +24,8 @@ void HandleMessage::ParseToSQL(QString input) {
 	QSqlQuery queryInsertData;
 	QString output = "INSERT INTO `tblMain` (`temperature`, `humidity`, `pressure`) VALUES ";
 	QStringList data;
-	QStringList list = input.split("\n");
+	QStringList list = input.split("\n",Qt::SkipEmptyParts);
 	for (int i = 0; i < list.size(); ++i) {
-		if (list[i].size() == 0) continue;
 		data=list[i].split(",");
 		bool valid;
 
@@ -43,6 +42,4 @@ void HandleMessage::ParseToSQL(QString input) {
 	printf("%s\n", output.toStdString().c_str());
 	queryInsertData.exec(output);
 }
-
-
 
