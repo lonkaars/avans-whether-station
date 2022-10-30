@@ -18,46 +18,49 @@ Client::~Client()
     delete timer;
 }
 
-void Client::ClientEcho()
-{
+void Client::ClientEcho() {
+	static unsigned int lineCounter = 0;
+	connect(timer, SIGNAL(timeout()),this,SLOT(timeFunction())); // connect timer to time every minute
 
-    connect(timer, SIGNAL(timeout()),this,SLOT(timeFunction())); // connect timer to time every minute
+	// connect to readyread to receive data;
+	connect(socket,&QTcpSocket::readyRead, [&]() {
+		QTextStream T(socket);
+		QString text = T.readAll(); //  reads all data
+		lineCounter++;
+		if (lineCounter <= 2) return;
+		Handlemsg.ParseToSQL(text);
+	});
 
-    // connect to readyread to receive data;
-    connect(socket,&QTcpSocket::readyRead, [&]() {
-        QTextStream T(socket);
-        QString text = T.readAll(); //  reads all data
-       Handlemsg.ParseToSQL(Handlemsg.ParseMessage(text, (totalRecords-'0')));
+	connect(socket, &QTcpSocket::disconnected, [&]() {
+		socket->disconnectFromHost();
+		lineCounter = 0;
+	});
 
-
-    });
-
-    timer->start(1000);
+	timer->start(1000);
 }
 
-void Client::timeFunction()
-{
-    totalRecords = WS_MAX(1, _missingRecords);
+void Client::timeFunction() {
+	if((QTime::currentTime().second() % WS_CLIENT_STATION_POLL_INTERVAL) != 0) return;
 
-    char* msg = NULL;
-    asprintf(&msg, "last-records %x %x\n", totalRecords, offsetRecords);
-    QByteArray msgToSend = msg;
-    free(msg);
+	this->missingRecords();
+	totalRecords = WS_MIN(WS_MAX(1, _missingRecords), 50);
 
-    QTime time = QTime::currentTime();
-    qint16 currentSeconds = time.second();
-    if((currentSeconds % WS_CLIENT_STATION_POLL_INTERVAL) == 1){
+	char* msg = NULL;
+	asprintf(&msg, "last-records %x %x\n", totalRecords, offsetRecords);
+	QByteArray msgToSend = msg;
+	free(msg);
 
-        socket->connectToHost(networkAddress, tcpPortAddress);
-        socket->write(msgToSend);
-    }
+	socket->connectToHost(networkAddress, tcpPortAddress);
+	socket->write(msgToSend);
 }
 
 void Client::missingRecords()
 {
     QSqlQuery queryTimeData;
-    queryTimeData.exec( "SELECT (unix_timestamp(now()) - unix_timestamp(`time`))/60 as delta FROM `tblMain` limit 1");
+    queryTimeData.exec("SELECT (unix_timestamp(now()) - unix_timestamp(`time`))/60 as delta FROM `tblMain` limit 1");
 
-    _missingRecords = queryTimeData.value(0).toInt();
-
+	queryTimeData.first();
+	unsigned int secondsSinceLastRecord = queryTimeData.value(0).toInt();
+	_missingRecords = secondsSinceLastRecord / WS_CLIENT_STATION_POLL_INTERVAL;
 }
+

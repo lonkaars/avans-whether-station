@@ -1,17 +1,22 @@
 #include "HandleMessage.h"
 
-HandleMessage::HandleMessage(QObject *parent) : QObject(parent)
-{
+HandleMessage::HandleMessage(QObject *parent) : QObject(parent) { }
 
-}
+void HandleMessage::ParseToSQL(QString input) {
+	QSqlQuery queryInsertData;
+	QString output = "insert into WSdb.tblMain (temperature, humidity, pressure) values ";
+	QStringList data;
 
-QString HandleMessage::ParseMessage(const QString Msg , int totalRecords )
-{
-    QString message= Msg.section('\n',2,(3+totalRecords));
+	output.append("(");
+	data=input.split(",");
 
-    return message;
+	for (int i = 1; i < data.size(); i++) {
+		bool valid;
+		output.append(QString::number(data[i].toInt(&valid, 16)));
+		if (i + 1 < data.size()) output.append(",");
+	}
 
-}
+	output.append(")");
 
 void HandleMessage::ParseToSQL(QString input)
 {

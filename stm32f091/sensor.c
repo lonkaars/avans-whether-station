@@ -13,42 +13,33 @@
 
 uint8_t ws_sensor_temperature() {
 	uint8_t buf[12];
-	int16_t val;
-	float temp_c;
 	buf[0] = SI7021_REG_TEMP;
 	HAL_I2C_Master_Transmit(&hi2c1, SI7021_ADDRESS, buf, 1, HAL_MAX_DELAY);
 	HAL_I2C_Master_Receive(&hi2c1, SI7021_ADDRESS, buf, 2, HAL_MAX_DELAY);
-	val = ((int16_t)buf[0]<< 8 ) | (buf[1]);
-	temp_c= ((175.72*val)/65536) - 46.85;
 
-	return (uint8_t) temp_c; //TODO: convert with range -> util.h
+	return ws_sensor_tmp_to_8(((int16_t)buf[0]<< 8 ) | (buf[1]));
 }
 
 uint8_t ws_sensor_humidity() {
 	uint8_t buf[12];
-	int16_t val;
 	buf[0] = SI7021_REG_HUM;
 	HAL_I2C_Master_Transmit(&hi2c1, SI7021_ADDRESS, buf, 1, HAL_MAX_DELAY);
 	HAL_I2C_Master_Receive(&hi2c1, SI7021_ADDRESS, buf, 2, HAL_MAX_DELAY);
-	val = ((int16_t)buf[0]<< 8 ) | (buf[1]);
-	float humidity = (( 125 * (float) val ) / 65536 ) - 6;
 
-	return (uint8_t) humidity; //TODO: convert with range -> util.h
+	return ws_sensor_hum_to_8(((int16_t)buf[0]<< 8 ) | (buf[1]));
 }
 
 uint8_t ws_sensor_atmospheric_pressure() {
 	uint8_t buf[12];
 	uint8_t buffer[12];
-	int16_t val;
 
 	buf[0]= 0xF4;
 	buf[1]= 0x07;
 	buffer[0] = 0xF7;
 	HAL_I2C_Master_Transmit(&hi2c1, BMP280_ADDRESS, buf , 2, HAL_MAX_DELAY);
 	HAL_I2C_Mem_Read(&hi2c1, BMP280_ADDRESS, 0xF7, 1, buffer, 2, 100 );
-	val = (buffer[0] << 8 | buffer[1]);
 
-	return (uint8_t) val; // TODO: convert with range
+	return ws_sensor_atm_to_8((uint16_t) buffer[0] << 8 | buffer[1]);
 }
 
 void ws_sensor_read() {

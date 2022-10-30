@@ -25,7 +25,7 @@ public slots:
 private:
     void missingRecords();
 
-    int _missingRecords;
+    int _missingRecords = 0;
     QTcpSocket *socket; // tcpsocket for communicating
     QTimer      *timer; // timer to read every second what time it curruntly is.
 
