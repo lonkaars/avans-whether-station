@@ -8,7 +8,7 @@ stm32f091/main.elf
 stm32f091/main.bin
 
 # client-specific files
-client/makefile
+client/client.mk
 client/client
 client/moc_*
 client/ui_*

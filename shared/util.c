@@ -6,6 +6,10 @@ unsigned int ws_log16(unsigned int x) {
     return l;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint8_t ws_sensor_tmp_to_8(uint16_t temperature) {
 	return temperature / 256;
 }
@@ -29,3 +33,8 @@ float ws_sensor_hum_to_f(uint8_t humidity) {
 float ws_sensor_atm_to_f(uint8_t atmospheric_pressure) {
 	return ((20.0 * atmospheric_pressure) / 256.0) + 990.0; // datasheet no?
 }
+
+#ifdef __cplusplus
+}
+#endif
+

@@ -1,4 +1,5 @@
 #include "HandleMessage.h"
+#include "../shared/util.h"
 
 HandleMessage::HandleMessage(QObject *parent) : QObject(parent) { }
 
@@ -20,31 +21,27 @@ HandleMessage::HandleMessage(QObject *parent) : QObject(parent) { }
 // }
 
 void HandleMessage::ParseToSQL(QString input) {
-    QSqlQuery queryInsertData;
-    QString output = "INSERT INTO `tblMain` (`temperature`, `humidity`, `pressure`) VALUES ";
-    QStringList data;
-    QStringList list = input.split("\n");
-    for (int i = 0; i < list.size(); ++i) {
+	QSqlQuery queryInsertData;
+	QString output = "INSERT INTO `tblMain` (`temperature`, `humidity`, `pressure`) VALUES ";
+	QStringList data;
+	QStringList list = input.split("\n");
+	for (int i = 0; i < list.size(); ++i) {
+		if (list[i].size() == 0) continue;
+		data=list[i].split(",");
+		bool valid;
 
-        output += "(";
+		output.append("(");
+		output.append(QString::number(ws_sensor_tmp_to_f(data[1].toInt(&valid, 16))));
+		output.append(",");
+		output.append(QString::number(ws_sensor_hum_to_f(data[2].toInt(&valid, 16))));
+		output.append(",");
+		output.append(QString::number(ws_sensor_atm_to_f(data[3].toInt(&valid, 16))));
+		output.append(")");
 
-        data=list[i].split(",");
-
-        for (int j = 1; j < data.size(); ++j) {
-            bool valid;
-            output.append(QString::number(data[j].toInt(&valid, 16)));
-            if (j <= data[j].size()) {
-                output.append(",");
-            }
-
-        }
-        output.append(")");
-
-        if (i+1 < list.size()){
-            output.append(",");
-        }
-    }
-   queryInsertData.exec(output);
+		if (i+1 < list.size()) output.append(",");
+	}
+	printf("%s\n", output.toStdString().c_str());
+	queryInsertData.exec(output);
 }
 
 

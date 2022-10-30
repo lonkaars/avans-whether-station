@@ -6,7 +6,7 @@ RM = rm -f
 TARGET = main
 HOST=$(strip $(shell uname -o))
 
-include ../shared/shared.mk
+OBJS += $(patsubst %.c,%-stm.o, $(wildcard ../shared/*.c))
 
 SHARED_FLAGS += -g
 SHARED_FLAGS += -DSTM32F091xC
