@@ -92,9 +92,7 @@ void ws_io_setup() {
 		.Pull = GPIO_NOPULL
 	});
 
-	// TODO: remove debug size
-	ws_backlog_alloc(24 * 60);
-	// ws_backlog_alloc(10);
+	ws_backlog_alloc(WS_BACKLOG_SIZE);
 
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
 	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_DBGMSG);
@@ -184,7 +182,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c) {
 
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 	HAL_GPIO_Init(GPIOB, &(GPIO_InitTypeDef) {
-		.Pin = GPIO_PIN_8|GPIO_PIN_9, //TODO: use #defines in setup.h
+		.Pin = WS_PINOUT_I2C_SCL_PIN | WS_PINOUT_I2C_SDA_PIN,
 		.Mode = GPIO_MODE_AF_OD,
 		.Pull = GPIO_NOPULL,
 		.Speed = GPIO_SPEED_FREQ_HIGH,

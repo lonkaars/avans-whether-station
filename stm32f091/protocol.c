@@ -7,7 +7,7 @@
 #include "esp8266.h"
 
 void ws_protocol_res_last_records(ws_s_protocol_parsed_req_cmd* parsed_cmd, ws_s_protocol_res* response, bool send) {
-	static int record_amount = 0;
+	static unsigned int record_amount = 0;
 	static unsigned int record_offset = 0;
 	const char* response_header = "id,temperature,humidity,atmospheric_pressure\n";
 	const unsigned int response_line_len = strlen("xxxx,xx,xx,xx\n");
@@ -21,7 +21,7 @@ void ws_protocol_res_last_records(ws_s_protocol_parsed_req_cmd* parsed_cmd, ws_s
 		if (sscanf(parsed_cmd->argv[2], "%x", &record_offset) < 1) response->success = WS_PROTOCOL_CMD_RETURN_ERROR;
 		else {
 			record_amount = WS_MIN(record_amount + record_offset, ws_backlog_get_record_count());
-			record_amount = WS_MAX(0, record_amount - record_offset);
+			record_amount = WS_MAX(0, (int) record_amount - (int) record_offset);
 			response->msg->bytes = strlen(response_header) + response_line_len * record_amount;
 		}
 	} else {

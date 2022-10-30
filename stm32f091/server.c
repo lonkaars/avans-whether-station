@@ -162,9 +162,8 @@ void ws_server_send(uint8_t* data, size_t size) {
 }
 
 void ws_server_buffer_send_append(uint8_t* data, size_t size) {
-	// TODO: buffer overrun protection
-	// while (!__HAL_DMA_GET_FLAG(&hdma_usart1_tx, DMA_FLAG_TC2)); // make sure buffer isn't used
-	strncpy((char*) &g_ws_esp8266_dma_tx_buffer[g_ws_esp8266_dma_tx_buffer_head], (char*) data, size); // append string
+  size_t limited_size = WS_MIN(size, g_ws_esp8266_dma_tx_buffer_head - g_ws_esp8266_dma_tx_buffer_tail);
+	strncpy((char*) &g_ws_esp8266_dma_tx_buffer[g_ws_esp8266_dma_tx_buffer_head], (char*) data, limited_size); // append string
 	g_ws_esp8266_dma_tx_buffer_head += size; // shift head
 }
 
@@ -201,24 +200,5 @@ void ws_server_buffer_send_chunk() {
 	if (g_ws_esp8266_dma_tx_buffer_head == g_ws_esp8266_dma_tx_buffer_tail) {
 		g_ws_esp8266_dma_tx_buffer_head = g_ws_esp8266_dma_tx_buffer_tail = 0;
 	}
-
-// #ifdef WS_DBG_PRINT_ESP_OVER_USART2
-// 	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_TX);
-// 	HAL_UART_Transmit(&huart2, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_head, 100);
-// #endif
-// 
-// 	HAL_UART_Transmit(&huart1, g_ws_esp8266_dma_tx_buffer, g_ws_esp8266_dma_tx_buffer_head, 100);
-// 	g_ws_esp8266_dma_tx_buffer_head = 0;
-// 
-// 	HAL_UART_Transmit(&huart1, (uint8_t*) "+++", 3, 100);
 }
 
-// TODO: refactor this
-void ws_server_req_respond_end(unsigned int channel) {
-	char* cmd = NULL;
-	size_t len = asiprintf(&cmd, "AT+CIPCLOSE=%d\r\n", channel);
-	g_ws_server_parser.mode = WS_SERVER_LM_CMD_ECHO;
-	ws_esp8266_send((uint8_t*) cmd, len);
-	while (!__HAL_DMA_GET_FLAG(&hdma_usart1_tx, DMA_FLAG_TC2));
-	free(cmd);
-}
