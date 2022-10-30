@@ -6,7 +6,6 @@
 //#include <QtSql>
 //#include <QSqlDatabase>
 
-
 namespace Ui {
 class dbConnector;
 }

@@ -16,8 +16,6 @@ public:
     QString ParseMessage(const QString  , int);
     void ParseToSQL(QString);
 
-
-
 private:
 
 };

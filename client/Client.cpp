@@ -1,5 +1,5 @@
 #include "Client.h"
-
+#include "consts.h"
 
 
 Client::Client(QObject *parent) : QObject(parent)
@@ -17,8 +17,6 @@ Client::~Client()
 
 void Client::ClientEcho()
 {
-    QTime time1 = QTime::currentTime();
-    NextMinute = time1.minute()+1;
 
     connect(timer, SIGNAL(timeout()),this,SLOT(timeFunction())); // connect timer to time every minute
 
@@ -45,13 +43,12 @@ void Client::timeFunction()
     QByteArray msgToSend= (msg.toUtf8() + totalRecords + offsetRecords +'\n');
 
     QTime time = QTime::currentTime();
-    qint16 currentMinute = time.minute();
+    qint16 currentSeconds = time.second();
+    auto _intervals = intervals;
+    if(currentSeconds % _intervals==0){
 
-    if(currentMinute==NextMinute){
         socket->connectToHost(networkAddress, tcpPortAddress);
-
         socket->write(msgToSend);
-        NextMinute++;
     }
 }
 

@@ -1,5 +1,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
+
 #include <QTcpSocket>
 #include <QTextStream>
 #include <QTimer>
@@ -27,7 +28,6 @@ private:
     QTcpSocket *socket; // tcpsocket for communicating
     QTimer      *timer; // timer to read every second what time it curruntly is.
 
-    qint16 NextMinute; // timing for next minute
     // qint16 currentMinute; // timing for currentMinute
     HandleMessage Handlemsg; // add HandleMessage to Client.h
 

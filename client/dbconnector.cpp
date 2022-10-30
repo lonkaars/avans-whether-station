@@ -3,7 +3,7 @@
 #include "main.h"
 
 #include "mainwindow.h"
-
+#
 dbConnector::dbConnector(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::dbConnector)
