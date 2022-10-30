@@ -3,7 +3,7 @@
 - [ ] more documentation in header files (for both client and stm code)
 - [ ] design/architecture document
 - [x] more tests in the test document
-- [ ] handle errors from `AT+CIPSEND`, these look like this:
+- [x] handle errors from `AT+CIPSEND`, these look like this:
       ```
       > AT0,CONNECT
 
@@ -19,10 +19,10 @@
 - [ ] `sensor.c:24:    return (uint8_t) temp_c; //TODO: convert with range -> util.h`
 - [ ] `sensor.c:36:    return (uint8_t) humidity; //TODO: convert with range -> util.h`
 - [ ] `sensor.c:51:    return (uint8_t) val; // TODO: convert with range`
-- [ ] `server.c:47:// TODO: next_few_bytes_are assumes that the complete search string is in the`
+- [x] `server.c:47:// TODO: next_few_bytes_are assumes that the complete search string is in the`
 - [ ] `server.c:146:   // TODO: buffer overrun protection`
-- [ ] `server.c:152:// TODO: refactor this`
-- [ ] `server.c:165:// TODO: refactor this`
-- [ ] `server.c:174:// TODO: refactor this`
+- [x] `server.c:152:// TODO: refactor this`
+- [x] `server.c:165:// TODO: refactor this`
+- [x] `server.c:174:// TODO: refactor this`
 - [ ] `setup.c:95:     // TODO: remove debug size`
 - [ ] `setup.c:187:            .Pin = GPIO_PIN_8|GPIO_PIN_9, //TODO: use #defines in setup.h`

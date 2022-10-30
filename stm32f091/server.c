@@ -55,9 +55,6 @@ static bool ws_server_is_response(char data, uint8_t* counter, const char* cmd, 
 	return false;
 }
 
-// TODO: next_few_bytes_are assumes that the complete search string is in the
-// buffer, so won't work for buffer cutoffs
-#define next_few_bytes_are(code) (((i + sizeof(code) - 2) < size) && (strncmp((char*)&data[i], code, sizeof(code) - 1) == 0))
 void ws_server_req_incoming(uint8_t* data, size_t size) {
 #ifdef WS_DBG_PRINT_ESP_OVER_USART2
 	ws_dbg_set_usart2_tty_color(WS_DBG_TTY_COLOR_RX);
