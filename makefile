@@ -8,10 +8,10 @@ client_makefile:
 	qmake client/client.pro -o client/makefile
 
 client: client_makefile
-	make -C client
+	make -jC client
 
 client_compile_commands: client_makefile
-	compiledb -o client/compile_commands.json make -C client
+	compiledb -o client/compile_commands.json make -BnC client
 
 stm32:
-	make -C stm32f091
+	make -jC stm32f091

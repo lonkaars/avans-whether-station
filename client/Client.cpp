@@ -35,29 +35,26 @@ void Client::ClientEcho()
     timer->start(1000);
 }
 
-void Client::timeFunction()
-{
-    totalRecords = WS_MAX(1, _missingRecords);
+void Client::timeFunction() {
+	if((QTime::currentTime().second() % WS_CLIENT_STATION_POLL_INTERVAL) != 0) return;
 
-    char* msg = NULL;
-    asprintf(&msg, "last-records %x %x\n", totalRecords, offsetRecords);
-    QByteArray msgToSend = msg;
-    free(msg);
+	this->missingRecords();
+	totalRecords = WS_MAX(1, _missingRecords);
 
-    QTime time = QTime::currentTime();
-    qint16 currentSeconds = time.second();
-    if((currentSeconds % WS_CLIENT_STATION_POLL_INTERVAL) == 1){
+	char* msg = NULL;
+	asprintf(&msg, "last-records %x %x\n", totalRecords, offsetRecords);
+	QByteArray msgToSend = msg;
+	free(msg);
 
-        socket->connectToHost(networkAddress, tcpPortAddress);
-        socket->write(msgToSend);
-    }
+	socket->connectToHost(networkAddress, tcpPortAddress);
+	socket->write(msgToSend);
 }
 
-void Client::missingRecords()
-{
-    QSqlQuery queryTimeData;
-    queryTimeData.exec("SELECT (unix_timestamp(now()) - unix_timestamp(`time`))/60 as delta FROM `WSdb`.`tblMain` limit 1");
-
-    _missingRecords = queryTimeData.value(0).toInt();
-
+void Client::missingRecords() {
+	QSqlQuery queryTimeData;
+	queryTimeData.exec("select unix_timestamp(now()) - unix_timestamp(time) as delta from WSdb.tblMain order by time desc limit 1");
+	queryTimeData.first();
+	unsigned int secondsSinceLastRecord = queryTimeData.value(0).toInt();
+	_missingRecords = secondsSinceLastRecord / WS_CLIENT_STATION_POLL_INTERVAL;
 }
+
