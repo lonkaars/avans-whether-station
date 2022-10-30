@@ -18,8 +18,8 @@ void HandleMessage::ParseToSQL(QString input)
 {
     QSqlQuery queryInsertData;
     QString output = "INSERT INTO `WSdb`.`tblMain` () VALUES ";
-    QVector<QString> data;
-    QVector<QString> list = input.split("\n");
+    QStringList data;
+    QStringList list = input.split("\n");
     for (int i = 0; i < list.size(); ++i) {
 
         output += "(";
