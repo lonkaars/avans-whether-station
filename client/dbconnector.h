@@ -5,8 +5,7 @@
 #include <QMessageBox>
 //#include <QtSql>
 //#include <QSqlDatabase>
-
-#define WS_ESP8266_WLAN_IP "129.168.0.1"
+#include "consts.h"
 
 namespace Ui {
 class dbConnector;
