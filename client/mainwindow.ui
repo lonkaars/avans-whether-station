@@ -34,7 +34,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAbouy">
@@ -42,16 +42,9 @@
      <string>Home</string>
     </property>
     <addaction name="actionRefresh"/>
-   </widget>
-   <widget class="QMenu" name="menuDatabase">
-    <property name="title">
-     <string>Database</string>
-    </property>
     <addaction name="actionConnection"/>
-    <addaction name="actionDisconnenct"/>
    </widget>
    <addaction name="menuAbouy"/>
-   <addaction name="menuDatabase"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionRefresh">
@@ -74,7 +67,7 @@
   </action>
   <action name="actionConnection">
    <property name="text">
-    <string>Connect</string>
+    <string>Settings</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>

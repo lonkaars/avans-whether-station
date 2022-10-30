@@ -9,6 +9,9 @@ dbConnector::dbConnector(QWidget *parent) :
     ui(new Ui::dbConnector)
 {
     ui->setupUi(this);
+    ui->lineEdit_espAdress->setText(_espHost);
+    ui->lineEdit_database->setText(_dbName);
+    ui->lineEdit_adress->setText(_dbHost);
 }
 
 dbConnector::~dbConnector()
@@ -18,29 +21,33 @@ dbConnector::~dbConnector()
 
 void dbConnector::on_pushButton_cancel_clicked()
 {
-    dbConnector::~dbConnector();
+    close();
 }
 
 void dbConnector::on_pushButton_login_clicked()
 {
-    QString hostname = ui->lineEdit_adress->text();
+    _espHost = ui->lineEdit_espAdress->text();
+    _dbHost = ui->lineEdit_adress->text();
+    _dbName = ui->lineEdit_database->text();
     QString username = ui->lineEdit_username->text();
     QString password = ui->lineEdit_password->text();
-    QString databaseName = ui->lineEdit_database->text();
 
-    dbRef.setHostName(hostname);
+    // Extract possible port (default if not provided)
+    QStringList dbAdress = _dbHost.split(":");
+    if (dbAdress.size() > 1){
+        dbRef.setPort(dbAdress[1].toInt());
+        qDebug() << dbAdress[1];
+    }
+
+    dbRef.setHostName(dbAdress[0]);
     dbRef.setUserName(username);
     dbRef.setPassword(password);
-    dbRef.setDatabaseName(databaseName);
+    dbRef.setDatabaseName(_dbName);
 
     if(dbRef.open()){
         QMessageBox::information(this, "Connection", "GREAT SUCCES!");
-        dbConnector::~dbConnector();
+        close();
     } else {
         QMessageBox::warning(this, "No connection", "Failed to connect");
     }
 }
-
-
-
-

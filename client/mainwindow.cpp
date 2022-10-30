@@ -12,11 +12,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     client.ClientEcho();
+    _dbConenctor = new dbConnector(this);
 }
 
 MainWindow::~MainWindow()
 {
     dbRef.close();
+    delete _dbConenctor;
     delete ui;
 }
 
@@ -27,7 +29,7 @@ void MainWindow::timeFunction()
 
 void MainWindow::on_actionConnection_triggered()
 {
-    _dbConenctor = new dbConnector(this);
+//    _dbConenctor->preLoadUi();
     _dbConenctor->show();
 }
 
@@ -48,7 +50,6 @@ void MainWindow::drawGraph(){
     QLineSeries *seriesPressure = new QLineSeries();
 
 
-
     if(dbRef.open()){
         QSqlQuery queryGraphData;
 //        queryGraphData.exec("select `tblMain`.`ID`, `temperature`, `humidity`, `pressure` FROM `tblMain` ORDER BY `tblMain`.`ID` DESC limit 16;");
@@ -57,16 +58,11 @@ void MainWindow::drawGraph(){
         for (int i = 0; queryGraphData.next(); ++i) {
 //            int time = queryGraphData.value(4).toTime().hour()*100 + queryGraphData.value(4).toTime().minute();
             int time = i;
-//            seriesPressure->append(queryGraphData.value(0).toInt(), queryGraphData.value(1).toFloat());
-//            seriesTemperature->append(i, queryGraphData.value(1).toInt());
-//            seriesHumidity->append(i, queryGraphData.value(2).toFloat());
-//            seriesPressure->append(i, queryGraphData.value(3).toInt());
 
             seriesTemperature->append(time, queryGraphData.value(1).toFloat());
             seriesHumidity->append(time, queryGraphData.value(2).toFloat());
             seriesPressure->append(time, (queryGraphData.value(3).toFloat()*100));
 
-//            qDebug() << time;
         }
 
 //        QPen pen(QRgb(0x57FF00));
@@ -106,9 +102,6 @@ void MainWindow::drawGraph(){
         layout->setHorizontalSpacing(0);
         layout->setContentsMargins(0,0,0,0);
 
-
-
-//        window->show();
 
         MainWindow::setCentralWidget(window);
 

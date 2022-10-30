@@ -6,6 +6,8 @@
 //#include <QtSql>
 //#include <QSqlDatabase>
 
+#define WS_ESP8266_WLAN_IP "129.168.0.1"
+
 
 namespace Ui {
 class dbConnector;
@@ -27,4 +29,8 @@ private slots:
 
 private:
     Ui::dbConnector *ui;
+
+    QString _dbHost = "localhost";
+    QString _dbName = "WSdb";
+    QString _espHost = WS_ESP8266_WLAN_IP;
 };
