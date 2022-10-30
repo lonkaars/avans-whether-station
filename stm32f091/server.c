@@ -162,7 +162,7 @@ void ws_server_send(uint8_t* data, size_t size) {
 }
 
 void ws_server_buffer_send_append(uint8_t* data, size_t size) {
-  size_t limited_size = WS_MIN(size, g_ws_esp8266_dma_tx_buffer_head - g_ws_esp8266_dma_tx_buffer_tail);
+  size_t limited_size = WS_MIN(size, WS_DMA_TX_BUFFER_SIZE - g_ws_esp8266_dma_tx_buffer_head);
 	strncpy((char*) &g_ws_esp8266_dma_tx_buffer[g_ws_esp8266_dma_tx_buffer_head], (char*) data, limited_size); // append string
 	g_ws_esp8266_dma_tx_buffer_head += size; // shift head
 }
