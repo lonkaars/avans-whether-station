@@ -26,11 +26,8 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::timeFunction() {
-	printf("timeFunction\n");
-	client.timeFunction(); // segfault ->?
 	if(client.refreshChart == true){
 		client.refreshChart = false;
-		printf("redrawing...\n");
 		drawGraph();
 	}
 }
