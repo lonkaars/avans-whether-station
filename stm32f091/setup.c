@@ -101,6 +101,9 @@ void ws_io_setup() {
 #endif
 
 	ws_esp8266_ap_client_mode();
+#ifdef WS_ESP8266_WLAN_HOSTNAME
+	ws_esp8266_set_hostname();
+#endif
 #ifdef WS_ESP8266_WLAN_MAC
 	ws_esp8266_set_mac();
 #endif

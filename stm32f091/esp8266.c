@@ -75,9 +75,11 @@ void ws_esp8266_ap_client_mode() {
 }
 
 void ws_esp8266_start_tcp_server() {
+	ws_esp8266_send_seq("AT+CIPSTATUS\r\n"); // show ip
 	ws_esp8266_send_seq("AT+CIPSERVER=0\r\n"); // stop tcp server (if running)
 	ws_esp8266_send_seq("AT+CIPMUX=1\r\n"); // enable multiplexing (allow multiple connections)
 	ws_esp8266_send_seq("AT+CIPSERVER=1," WS_SERVER_PORT_STR "\r\n"); // start tcp server
+	ws_esp8266_send_seq("AT+CIPSTA?\r\n");
 }
 
 void ws_esp8266_set_mac() {
@@ -86,4 +88,8 @@ void ws_esp8266_set_mac() {
 
 void ws_esp8266_set_ip() {
 	ws_esp8266_send_seq("AT+CIPSTA=\"" WS_ESP8266_WLAN_IP "\"\r\n");
+}
+
+void ws_esp8266_set_hostname() {
+	ws_esp8266_send_seq("AT+CWHOSTNAME=\"" WS_ESP8266_WLAN_HOSTNAME "\"\r\n");
 }

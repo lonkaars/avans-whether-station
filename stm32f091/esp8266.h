@@ -36,3 +36,5 @@ void ws_esp8266_start_tcp_server();
 void ws_esp8266_set_mac();
 /** @brief set static ip address of the esp client */
 void ws_esp8266_set_ip();
+/** @brief set hostname of the esp client */
+void ws_esp8266_set_hostname();
